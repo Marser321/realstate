@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { SearchDialog } from "@/components/search/SearchDialog";
 
 const fontSans = Inter({
   subsets: ["latin"],
@@ -80,6 +81,7 @@ export default function RootLayout({
           fontSerif.variable
         )}
       >
+        <SearchDialog />
         {children}
       </body>
     </html>

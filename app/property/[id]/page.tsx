@@ -8,6 +8,7 @@ import { MapPin, Bed, Bath, Home, Share, Heart, Phone, MessageCircle } from "luc
 import { motion } from "framer-motion";
 import { ParallaxGallery } from "@/components/luxe/ParallaxGallery";
 import { ScrollRevealSection, StickySidebar, FeatureReveal, TextReveal } from "@/components/luxe/ScrollAnimations";
+import { InvestmentPotential } from "@/components/property/InvestmentPotential";
 import Link from "next/link";
 
 // Mock property data - Replace with real data fetching
@@ -145,6 +146,11 @@ export default function PropertyDetailPage() {
                             </div>
                         </ScrollRevealSection>
 
+                        {/* Investment Potential Section */}
+                        <ScrollRevealSection delay={0.15}>
+                            <InvestmentPotential />
+                        </ScrollRevealSection>
+
                         {/* Amenities with Feature Reveal */}
                         <ScrollRevealSection delay={0.2}>
                             <div>
@@ -259,7 +265,32 @@ export default function PropertyDetailPage() {
             </div>
 
             {/* BACK TO TOP / FOOTER SPACER */}
-            <div className="h-32" />
+            <div className="h-32 lg:h-12" />
+
+            {/* MOBILE STICKY CTA BAR */}
+            <motion.div
+                initial={{ y: 100 }}
+                animate={{ y: 0 }}
+                transition={{ delay: 1 }}
+                className="fixed bottom-0 left-0 right-0 bg-background/90 backdrop-blur-xl border-t border-border p-4 pb-8 z-50 lg:hidden shadow-[0_-5px_20px_rgba(0,0,0,0.1)]"
+            >
+                <div className="flex items-center gap-4">
+                    <div className="flex-1">
+                        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Precio</p>
+                        <p className="text-2xl font-serif font-bold text-foreground">{formatPrice(PROPERTY.price)}</p>
+                    </div>
+                    <Button
+                        size="lg"
+                        className="bg-[#D4AF37] hover:bg-[#B8942F] text-white rounded-xl shadow-lg shadow-[#D4AF37]/20"
+                        asChild
+                    >
+                        <a href={`https://wa.me/${PROPERTY.agent.whatsapp}?text=Hola! Me interesa la propiedad ${PROPERTY.title}`} target="_blank" rel="noopener noreferrer">
+                            <MessageCircle className="w-5 h-5 mr-2" />
+                            WhatsApp
+                        </a>
+                    </Button>
+                </div>
+            </motion.div>
         </div>
     );
 }
