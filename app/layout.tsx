@@ -17,14 +17,52 @@ const fontSerif = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Luxe Estate | Punta del Este Luxury Real Estate",
-  description: "Descubre propiedades de lujo en Punta del Este. Búsqueda inteligente con IA para encontrar tu hogar ideal.",
-  keywords: ["Punta del Este", "Real Estate", "Luxury", "Properties", "La Barra", "José Ignacio"],
+  title: {
+    default: "Luxe Estate | Punta del Este Luxury Real Estate",
+    template: "%s | Luxe Estate"
+  },
+  description: "Descubre las propiedades más exclusivas de Punta del Este. Búsqueda inteligente con IA para encontrar tu hogar ideal en La Barra, José Ignacio y más.",
+  keywords: ["Punta del Este", "Real Estate", "Luxury", "Inmobiliaria", "Punta del Este Properties", "La Barra", "José Ignacio", "Punta Ballena"],
+  authors: [{ name: "Luxe Estate Team" }],
+  creator: "Luxe Estate",
+  publisher: "Luxe Estate",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   openGraph: {
     title: "Luxe Estate | Punta del Este Luxury Real Estate",
-    description: "Descubre propiedades de lujo en Punta del Este.",
-    type: "website",
+    description: "Descubre las propiedades más exclusivas de Punta del Este con nuestra búsqueda inteligente.",
+    url: "https://realstate-nu.vercel.app",
+    siteName: "Luxe Estate",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Luxe Estate - Luxury Real Estate Punta del Este",
+      },
+    ],
     locale: "es_UY",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Luxe Estate | Punta del Este Luxury Real Estate",
+    description: "Búsqueda inteligente de propiedades de lujo en Punta del Este.",
+    images: ["/og-image.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 

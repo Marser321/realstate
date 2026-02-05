@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { MapPin, Bed, Bath, Maximize2, Heart } from 'lucide-react';
 import { useState, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Property {
     id: number | string;
@@ -80,16 +81,19 @@ export function PropertyCard({ property, onHover, index = 0 }: PropertyCardProps
                     onMouseLeave={handleMouseLeave}
                 >
                     {/* Image Container - 70% height for Bento style */}
-                    <div className="relative aspect-[4/3] overflow-hidden">
+                    <div className="relative aspect-[4/3] overflow-hidden bg-muted">
                         {/* Main Image with Slideshow */}
                         <div className="absolute inset-0">
                             {images.map((img, i) => (
-                                <img
+                                <Image
                                     key={i}
                                     src={img}
                                     alt={`${property.title} - Image ${i + 1}`}
-                                    className={`absolute inset-0 w-full h-full object-cover property-card-image transition-opacity duration-500 ${i === currentImageIndex ? 'opacity-100' : 'opacity-0'
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                    className={`object-cover property-card-image transition-opacity duration-500 ${i === currentImageIndex ? 'opacity-100' : 'opacity-0'
                                         }`}
+                                    priority={index < 2}
                                 />
                             ))}
                         </div>
@@ -111,8 +115,8 @@ export function PropertyCard({ property, onHover, index = 0 }: PropertyCardProps
                                 setIsFavorite(!isFavorite);
                             }}
                             className={`absolute top-4 right-4 z-10 p-2.5 rounded-full backdrop-blur-sm transition-all duration-300 ${isFavorite
-                                    ? 'bg-[#D4AF37] text-white'
-                                    : 'bg-white/90 text-foreground hover:bg-[#D4AF37] hover:text-white'
+                                ? 'bg-[#D4AF37] text-white'
+                                : 'bg-white/90 text-foreground hover:bg-[#D4AF37] hover:text-white'
                                 }`}
                         >
                             <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
