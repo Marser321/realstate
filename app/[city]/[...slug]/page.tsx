@@ -31,8 +31,8 @@ export async function generateMetadata({ params }: PageProps) {
         : `Luxury Real Estate`
 
     return {
-        title: `${titleStart} in ${titleLocation} | PuntaRealEstate`,
-        description: `Discover exclusive properties in ${titleLocation}. Browser our curated selection of luxury homes.`,
+        title: `${titleStart} in ${titleLocation} | Luxe Estate`,
+        description: `Descubra propiedades exclusivas en ${titleLocation}. Navegue por nuestra selección curada de casas de lujo.`,
     }
 }
 
