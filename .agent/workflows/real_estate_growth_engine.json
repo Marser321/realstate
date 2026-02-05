@@ -1,0 +1,133 @@
+{
+    "name": "Real_Estate_Growth_Engine",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours",
+                            "triggerAtHour": 8
+                        }
+                    ]
+                }
+            },
+            "id": "trigger-daily",
+            "name": "Daily Trigger (8am)",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1,
+            "position": [
+                200,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "url": "https://api.scraper-service.com/leads?q=owner+selling+house+montevideo",
+                "method": "GET"
+            },
+            "id": "http-scraper",
+            "name": "Scraper Placeholder",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 3,
+            "position": [
+                400,
+                300
+            ],
+            "notes": "Replace with actual Google Maps or Portal scraper integration"
+        },
+        {
+            "parameters": {
+                "jsCode": "return items.map(item => {\n  const json = item.json;\n  return {\n    json: {\n      ...json,\n      is_agency: json.owner_name.toLowerCase().includes('inmobiliaria') || json.owner_name.toLowerCase().includes('propiedades'),\n      price_gap: ((json.listed_price - json.market_estimate) / json.market_estimate) * 100\n    }\n  }\n});"
+            },
+            "id": "filter-logic",
+            "name": "Filter Logic",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 1,
+            "position": [
+                600,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "executeQuery",
+                "query": "INSERT INTO prospect_properties (source, address, listed_price, owner_name, review_status) VALUES ($1, $2, $3, $4, 'new') RETURNING id;"
+            },
+            "id": "supabase-insert",
+            "name": "Save to Supabase",
+            "type": "n8n-nodes-base.postgres",
+            "typeVersion": 1,
+            "position": [
+                800,
+                300
+            ],
+            "credentials": {
+                "postgres": {
+                    "id": "supabase-creds",
+                    "name": "Supabase DB"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "resource": "chat",
+                "prompt": "Analyze this property description and generate a highly personalized 'value-first' outreach message. Do NOT sell. Offer our free HDR photo kit.\n\nProperty: {{ $json.address }}\nDescription: {{ $json.description }}\nOwner: {{ $json.owner_name }}"
+            },
+            "id": "openai-enrichment",
+            "name": "AI Personalization",
+            "type": "n8n-nodes-base.openAi",
+            "typeVersion": 1,
+            "position": [
+                1000,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Daily Trigger (8am)": {
+            "main": [
+                [
+                    {
+                        "node": "Scraper Placeholder",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Scraper Placeholder": {
+            "main": [
+                [
+                    {
+                        "node": "Filter Logic",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Filter Logic": {
+            "main": [
+                [
+                    {
+                        "node": "Save to Supabase",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Save to Supabase": {
+            "main": [
+                [
+                    {
+                        "node": "AI Personalization",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
