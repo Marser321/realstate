@@ -2,11 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import { stripe, isStripeConfigured, FEATURED_PRODUCT } from '@/lib/stripe'
 import { createClient } from '@supabase/supabase-js'
 
-// Server-side Supabase client with service role
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+// Lazy Supabase admin client (created at runtime, not build time)
+function getSupabaseAdmin() {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+    if (!url || !key) {
+        throw new Error('Supabase environment variables not configured')
+    }
+
+    return createClient(url, key)
+}
 
 export async function POST(request: NextRequest) {
     try {
@@ -15,6 +21,9 @@ export async function POST(request: NextRequest) {
         if (!propertyId) {
             return NextResponse.json({ error: 'Property ID is required' }, { status: 400 })
         }
+
+        // Get Supabase client at runtime
+        const supabaseAdmin = getSupabaseAdmin()
 
         // SIMULATION MODE: If Stripe is not configured, update directly
         if (!isStripeConfigured() || !stripe) {
