@@ -91,7 +91,11 @@ export default function DashboardPage() {
 
     const [properties, setProperties] = useState<PropertyRow[]>([])
     const [loading, setLoading] = useState(true)
-    const [showToast, setShowToast] = useState(showCreatedToast)
+
+    // New Toast System
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' } | null>(
+        showCreatedToast ? { message: '¡Propiedad creada exitosamente!', type: 'success' } : null
+    )
 
     // Fetch properties from Supabase
     useEffect(() => {
@@ -116,21 +120,27 @@ export default function DashboardPage() {
 
     // Hide toast after 3 seconds
     useEffect(() => {
-        if (showToast) {
+        if (toast) {
             const timer = setTimeout(() => {
-                setShowToast(false)
-                // Remove query param
-                router.replace('/partners/dashboard', { scroll: false })
+                setToast(null)
+                // Remove query param if it was the created toast
+                if (showCreatedToast && toast.type === 'success') {
+                    router.replace('/partners/dashboard', { scroll: false })
+                }
             }, 3000)
             return () => clearTimeout(timer)
         }
-    }, [showToast, router])
+    }, [toast, router, showCreatedToast])
+
+    const handleComingSoon = () => {
+        setToast({ message: 'Funcionalidad próximamente disponible', type: 'info' })
+    }
 
     const handleToggleFeatured = async (propertyId: number) => {
         const property = properties.find(p => p.id === propertyId)
         if (!property) return
 
-        // If already featured, just toggle off
+        // If already features, just toggle off
         if (property.is_featured) {
             setProperties(prev => prev.map(p =>
                 p.id === propertyId ? { ...p, is_featured: false } : p
@@ -162,7 +172,7 @@ export default function DashboardPage() {
                 setProperties(prev => prev.map(p =>
                     p.id === propertyId ? { ...p, is_featured: true } : p
                 ))
-                setShowToast(true)
+                setToast({ message: '¡Propiedad destacada exitosamente!', type: 'success' })
             } else if (data.url) {
                 // Live mode - redirect to Stripe
                 window.location.href = data.url
@@ -222,16 +232,17 @@ export default function DashboardPage() {
 
     return (
         <div className="min-h-[calc(100vh-4rem)] p-6 md:p-8">
-            {/* Success Toast */}
-            {showToast && (
+            {/* Generic Toast */}
+            {toast && (
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-xl bg-emerald-500 text-white font-medium flex items-center gap-2 shadow-lg"
+                    className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-xl text-white font-medium flex items-center gap-2 shadow-lg ${toast.type === 'success' ? 'bg-emerald-500' : 'bg-blue-500'
+                        }`}
                 >
-                    <CheckCircle2 className="w-5 h-5" />
-                    ¡Propiedad creada exitosamente!
+                    {toast.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <Zap className="w-5 h-5" />}
+                    {toast.message}
                 </motion.div>
             )}
 
@@ -335,7 +346,10 @@ export default function DashboardPage() {
                     transition={{ delay: 0.3 }}
                     className="grid grid-cols-1 md:grid-cols-3 gap-4"
                 >
-                    <button className="p-4 rounded-xl border border-border hover:border-gold/50 bg-background/50 text-left group transition-all">
+                    <button
+                        onClick={handleComingSoon}
+                        className="p-4 rounded-xl border border-border hover:border-gold/50 bg-background/50 text-left group transition-all"
+                    >
                         <Building2 className="w-8 h-8 text-gold mb-3" />
                         <h3 className="font-medium text-foreground group-hover:text-gold transition-colors">
                             Editar Perfil de Agencia
@@ -344,7 +358,10 @@ export default function DashboardPage() {
                             Actualiza logo, descripción y contacto
                         </p>
                     </button>
-                    <button className="p-4 rounded-xl border border-border hover:border-gold/50 bg-background/50 text-left group transition-all">
+                    <button
+                        onClick={handleComingSoon}
+                        className="p-4 rounded-xl border border-border hover:border-gold/50 bg-background/50 text-left group transition-all"
+                    >
                         <TrendingUp className="w-8 h-8 text-gold mb-3" />
                         <h3 className="font-medium text-foreground group-hover:text-gold transition-colors">
                             Analíticas Avanzadas

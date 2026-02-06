@@ -241,6 +241,130 @@ export interface Database {
                     view_count?: number
                 }
             }
+            outreach_queue: {
+                Row: {
+                    id: string
+                    lead_id: string
+                    created_at: string
+                    stage: 'initial' | 'followup_1' | 'followup_2' | 'final' | 'manual' | null
+                    channel: 'whatsapp' | 'email' | 'sms'
+                    status: 'pending' | 'processing' | 'sent' | 'failed' | 'cancelled' | null
+                    scheduled_for: string
+                    template_id: string | null
+                    message_body: string | null
+                    personalization_data: Json | null
+                    attempts: number | null
+                    last_error: string | null
+                }
+                Insert: {
+                    id?: string
+                    lead_id: string
+                    created_at?: string
+                    stage?: 'initial' | 'followup_1' | 'followup_2' | 'final' | 'manual' | null
+                    channel: 'whatsapp' | 'email' | 'sms'
+                    status?: 'pending' | 'processing' | 'sent' | 'failed' | 'cancelled' | null
+                    scheduled_for?: string
+                    template_id?: string | null
+                    message_body?: string | null
+                    personalization_data?: Json | null
+                    attempts?: number | null
+                    last_error?: string | null
+                }
+                Update: {
+                    id?: string
+                    lead_id?: string
+                    created_at?: string
+                    stage?: 'initial' | 'followup_1' | 'followup_2' | 'final' | 'manual' | null
+                    channel?: 'whatsapp' | 'email' | 'sms'
+                    status?: 'pending' | 'processing' | 'sent' | 'failed' | 'cancelled' | null
+                    scheduled_for?: string
+                    template_id?: string | null
+                    message_body?: string | null
+                    personalization_data?: Json | null
+                    attempts?: number | null
+                    last_error?: string | null
+                }
+            }
+            prospect_properties: {
+                Row: {
+                    id: string
+                    created_at: string
+                    updated_at: string
+                    source: 'google_maps' | 'mercadolibre' | 'facebook' | 'infocasas' | 'gallito' | 'other'
+                    original_url: string | null
+                    external_id: string | null
+                    address: string | null
+                    neighborhood: string | null
+                    city: string | null
+                    property_type: 'casa' | 'apartamento' | 'terreno' | 'local' | 'ph' | 'other' | null
+                    description: string | null
+                    listed_price: number | null
+                    currency: string | null
+                    market_price_estimate: number | null
+                    price_gap_percentage: number | null
+                    days_on_market: number | null
+                    owner_name: string | null
+                    owner_phone: string | null
+                    owner_email: string | null
+                    owner_whatsapp: string | null
+                    quality_score: number | null
+                    status: 'new' | 'qualified' | 'disqualified' | 'contacted' | 'converted' | null
+                    disqualification_reason: string | null
+                    meta: Json | null
+                }
+                Insert: {
+                    id?: string
+                    created_at?: string
+                    updated_at?: string
+                    source: 'google_maps' | 'mercadolibre' | 'facebook' | 'infocasas' | 'gallito' | 'other'
+                    original_url?: string | null
+                    external_id?: string | null
+                    address?: string | null
+                    neighborhood?: string | null
+                    city?: string | null
+                    property_type?: 'casa' | 'apartamento' | 'terreno' | 'local' | 'ph' | 'other' | null
+                    description?: string | null
+                    listed_price?: number | null
+                    currency?: string | null
+                    market_price_estimate?: number | null
+                    price_gap_percentage?: number | null
+                    days_on_market?: number | null
+                    owner_name?: string | null
+                    owner_phone?: string | null
+                    owner_email?: string | null
+                    owner_whatsapp?: string | null
+                    quality_score?: number | null
+                    status?: 'new' | 'qualified' | 'disqualified' | 'contacted' | 'converted' | null
+                    disqualification_reason?: string | null
+                    meta?: Json | null
+                }
+                Update: {
+                    id?: string
+                    created_at?: string
+                    updated_at?: string
+                    source?: 'google_maps' | 'mercadolibre' | 'facebook' | 'infocasas' | 'gallito' | 'other'
+                    original_url?: string | null
+                    external_id?: string | null
+                    address?: string | null
+                    neighborhood?: string | null
+                    city?: string | null
+                    property_type?: 'casa' | 'apartamento' | 'terreno' | 'local' | 'ph' | 'other' | null
+                    description?: string | null
+                    listed_price?: number | null
+                    currency?: string | null
+                    market_price_estimate?: number | null
+                    price_gap_percentage?: number | null
+                    days_on_market?: number | null
+                    owner_name?: string | null
+                    owner_phone?: string | null
+                    owner_email?: string | null
+                    owner_whatsapp?: string | null
+                    quality_score?: number | null
+                    status?: 'new' | 'qualified' | 'disqualified' | 'contacted' | 'converted' | null
+                    disqualification_reason?: string | null
+                    meta?: Json | null
+                }
+            }
         }
         Functions: {
             get_user_agency: {
@@ -271,3 +395,6 @@ export type Profile = Database['public']['Tables']['profiles']['Row']
 export type ProfileInsert = Database['public']['Tables']['profiles']['Insert']
 
 export type Location = Database['public']['Tables']['locations']['Row']
+
+export type ProspectProperty = Database['public']['Tables']['prospect_properties']['Row']
+export type OutreachQueue = Database['public']['Tables']['outreach_queue']['Row']

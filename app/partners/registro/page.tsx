@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Building2, User, Upload, Check, ArrowRight, ArrowLeft } from 'lucide-react'
+import Image from 'next/image'
 
 // Step indicator component
 function StepIndicator({ currentStep }: { currentStep: number }) {
@@ -85,7 +86,14 @@ function LogoUploader({ value, onChange }: { value: File | null; onChange: (file
             />
             {preview ? (
                 <div className="flex flex-col items-center gap-3">
-                    <img src={preview} alt="Logo preview" className="w-24 h-24 object-contain rounded-lg" />
+                    <Image
+                        src={preview}
+                        alt="Logo preview"
+                        width={96}
+                        height={96}
+                        className="w-24 h-24 object-contain rounded-lg"
+                        unoptimized
+                    />
                     <p className="text-sm text-muted-foreground">Haz clic para cambiar</p>
                 </div>
             ) : (
@@ -171,8 +179,7 @@ export default function RegistroPage() {
         // 4. Upload logo to Supabase Storage
         // 5. Redirect to dashboard
 
-        console.log('Registering agency:', agencyData)
-        console.log('Admin data:', adminData)
+
 
         // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 2000))

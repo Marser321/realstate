@@ -10,6 +10,7 @@ import { ParallaxGallery } from "@/components/luxe/ParallaxGallery";
 import { ScrollRevealSection, StickySidebar, FeatureReveal, TextReveal } from "@/components/luxe/ScrollAnimations";
 import { InvestmentPotential } from "@/components/property/InvestmentPotential";
 import Link from "next/link";
+import Image from "next/image";
 
 interface PropertyData {
     id: number;
@@ -239,11 +240,14 @@ export default function PropertyDetailClient({ property }: PropertyDetailClientP
                                 className="bg-muted rounded-2xl p-6 flex items-center gap-5"
                             >
                                 <div className="w-20 h-20 bg-muted-foreground/20 rounded-full overflow-hidden ring-2 ring-[#D4AF37] ring-offset-2 ring-offset-background">
-                                    <img
+                                    <Image
                                         src={property.agent.avatar}
                                         alt={property.agent.name}
+                                        width={80}
+                                        height={80}
                                         className="w-full h-full object-cover"
                                     />
+
                                 </div>
                                 <div>
                                     <p className="text-sm text-muted-foreground font-medium">Tu asesor</p>

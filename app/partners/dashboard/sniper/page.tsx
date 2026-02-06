@@ -13,6 +13,7 @@ import {
 import { ProspectsTable, ProspectRow } from '@/components/partners/ProspectsTable'
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/client'
+import { ProspectProperty } from '@/types/supabase'
 
 // Stat Card Component
 function StatCard({
@@ -60,29 +61,55 @@ export default function SniperDashboard() {
     const [loading, setLoading] = useState(true)
     const supabase = createClient()
 
+    // Subscribe to realtime changes
     useEffect(() => {
         const fetchProspects = async () => {
             setLoading(true)
             const { data, error } = await supabase
-                .from('prospect_properties' as any)
+                .from('prospect_properties')
                 .select('*')
                 .order('created_at', { ascending: false })
                 .limit(50)
 
             if (data) {
-                // Map DB columns to UI types if needed, though they match closely now
-                setProspects(data as unknown as ProspectRow[])
+                // Map DB columns to UI types
+                const mappedProspects: ProspectRow[] = (data as ProspectProperty[]).map(p => ({
+                    id: p.id,
+                    address: p.address || 'Sin dirección',
+                    owner_name: p.owner_name || 'Desconocido',
+                    listed_price: p.listed_price || 0,
+                    market_estimate: p.market_price_estimate || 0,
+                    source: (p.source as ProspectRow['source']) || 'google_maps',
+                    status: (p.status as ProspectRow['status']) || 'new',
+                    quality_score: p.quality_score || 0,
+                    days_on_market: p.days_on_market || 0,
+                    last_contact: p.updated_at // using updated_at as proxy for last contact
+                }))
+                setProspects(mappedProspects)
             }
             if (error) console.error('Error fetching prospects:', error)
             setLoading(false)
         }
 
         fetchProspects()
-        // Subscribe to realtime changes
+
         const channel = supabase
             .channel('realtime_prospects')
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'prospect_properties' }, (payload: any) => {
-                setProspects((current) => [payload.new as unknown as ProspectRow, ...current])
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'prospect_properties' }, (payload) => {
+                const newProspect = payload.new as ProspectProperty
+                const mapped: ProspectRow = {
+                    id: newProspect.id,
+                    address: newProspect.address || 'Sin dirección',
+                    owner_name: newProspect.owner_name || 'Desconocido',
+                    listed_price: newProspect.listed_price || 0,
+                    market_estimate: newProspect.market_price_estimate || 0,
+                    source: (newProspect.source as ProspectRow['source']) || 'google_maps',
+                    status: (newProspect.status as ProspectRow['status']) || 'new',
+                    quality_score: newProspect.quality_score || 0,
+                    days_on_market: newProspect.days_on_market || 0,
+                    last_contact: newProspect.updated_at
+                }
+                setProspects((current) => [mapped, ...current])
             })
             .subscribe()
 
@@ -92,30 +119,33 @@ export default function SniperDashboard() {
     }, [supabase])
 
     const handleAction = async (id: string, action: string) => {
-        console.log(`Action ${action} on prospect ${id}`)
         // Implement status update logic
         if (action === 'approve') {
-            // @Jules: Fix database types to include prospect_properties and outreach_queue
-            const { error: updateError } = await (supabase.from('prospect_properties' as any) as any).update({ status: 'qualified' }).eq('id', id)
+            const { error: updateError } = await supabase
+                .from('prospect_properties')
+                .update({ status: 'qualified' })
+                .eq('id', id)
 
             if (!updateError) {
                 // Insert into outreach queue to trigger N8N flow
-                await (supabase.from('outreach_queue' as any) as any).insert({
-                    lead_id: id,
-                    channel: 'whatsapp',
-                    status: 'pending',
-                    scheduled_for: new Date().toISOString()
-                })
+                await supabase
+                    .from('outreach_queue')
+                    .insert({
+                        lead_id: id,
+                        channel: 'whatsapp',
+                        status: 'pending',
+                        scheduled_for: new Date().toISOString()
+                    })
             }
 
             // Optimistic update
             setProspects(prev => prev.map(p => p.id === id ? { ...p, status: 'qualified' } : p))
         } else if (action === 'video_audit') {
-            await (supabase.from('prospect_properties' as any) as any).update({ status: 'contacted' }).eq('id', id)
+            await supabase.from('prospect_properties').update({ status: 'contacted' }).eq('id', id)
             // Optimistic update
             setProspects(prev => prev.map(p => p.id === id ? { ...p, status: 'contacted' } : p))
         } else if (action === 'reject') {
-            await (supabase.from('prospect_properties' as any) as any).update({ status: 'disqualified' }).eq('id', id)
+            await supabase.from('prospect_properties').update({ status: 'disqualified' }).eq('id', id)
             // Optimistic update
             setProspects(prev => prev.map(p => p.id === id ? { ...p, status: 'disqualified' } : p))
         }
