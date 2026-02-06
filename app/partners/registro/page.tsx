@@ -172,20 +172,39 @@ export default function RegistroPage() {
 
         setIsSubmitting(true)
 
-        // TODO: Implement actual Supabase registration
-        // 1. Sign up user with Supabase Auth
-        // 2. Create agency record
-        // 3. Create agency_user record (owner role)
-        // 4. Upload logo to Supabase Storage
-        // 5. Redirect to dashboard
+        try {
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    agencyName: agencyData.name,
+                    agencySlug: agencyData.slug,
+                    city: agencyData.city,
+                    description: agencyData.description,
+                    adminEmail: adminData.email,
+                    adminPassword: adminData.password,
+                    adminName: adminData.fullName,
+                }),
+            })
 
+            const data = await response.json()
 
+            if (!response.ok) {
+                throw new Error(data.error || 'Error al registrar')
+            }
 
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000))
+            // Success! Redirect to login
+            // We can add a query param to show a success message on login page if implemented
+            window.location.href = '/partners/login?registered=true'
 
-        // Redirect to dashboard
-        window.location.href = '/partners/dashboard'
+        } catch (error: any) {
+            console.error('Registration error:', error)
+            alert(error.message || 'Error al conectar con el servidor')
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     return (
