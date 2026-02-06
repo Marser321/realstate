@@ -7,6 +7,8 @@ import { MapWithListings } from "@/components/luxe/MapWithListings";
 import { Footer } from "@/components/luxe/Footer";
 import { createClient } from "@/utils/supabase/server";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   // 1. SAFETY CHECK: Do not attempt to create client if keys are missing
   const hasSupabaseKeys = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
