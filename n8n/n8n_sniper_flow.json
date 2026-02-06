@@ -175,7 +175,7 @@
                 }
             },
             "id": "sniper-save-006",
-            "name": "Save to Supabase",
+            "name": "Save Prospect",
             "type": "n8n-nodes-base.supabase",
             "typeVersion": 1,
             "position": [
@@ -188,6 +188,66 @@
                     "name": "Supabase Account"
                 }
             }
+        },
+        {
+            "parameters": {
+                "tableId": "properties",
+                "fieldsUi": {
+                    "fieldValues": [
+                        {
+                            "fieldId": "title",
+                            "value": "={{ $('Split Results').item.json.title }}"
+                        },
+                        {
+                            "fieldId": "slug",
+                            "value": "={{ $('Split Results').item.json.title.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + $json.price }}"
+                        },
+                        {
+                            "fieldId": "price",
+                            "value": "={{ $json.price || 0 }}"
+                        },
+                        {
+                            "fieldId": "description",
+                            "value": "={{ $('Split Results').item.json.snippet }}"
+                        },
+                        {
+                            "fieldId": "location_id",
+                            "value": 1
+                        },
+                        {
+                            "fieldId": "source_url",
+                            "value": "={{ $('Split Results').item.json.link }}"
+                        },
+                        {
+                            "fieldId": "status",
+                            "value": "for_sale"
+                        },
+                        {
+                            "fieldId": "is_featured",
+                            "value": false
+                        },
+                        {
+                            "fieldId": "features",
+                            "value": "{ \"auto_generated\": true }"
+                        }
+                    ]
+                }
+            },
+            "id": "sniper-promote-007",
+            "name": "Auto-Promote to Live",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                1600,
+                300
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "YOUR_SUPABASE_ID",
+                    "name": "Supabase Account"
+                }
+            },
+            "notes": "Automatically pushes high-confidence prospects to the Value-Add platform layer (properties table)"
         }
     ],
     "connections": {
@@ -261,7 +321,18 @@
             "main": [
                 [
                     {
-                        "node": "Save to Supabase",
+                        "node": "Save Prospect",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Save Prospect": {
+            "main": [
+                [
+                    {
+                        "node": "Auto-Promote to Live",
                         "type": "main",
                         "index": 0
                     }

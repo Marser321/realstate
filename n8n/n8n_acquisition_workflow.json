@@ -86,6 +86,57 @@
         },
         {
             "parameters": {
+                "tableId": "agencies",
+                "fieldsUi": {
+                    "fieldValues": [
+                        {
+                            "fieldId": "name",
+                            "value": "={{ $json.name }}"
+                        },
+                        {
+                            "fieldId": "slug",
+                            "value": "={{ ($json.name).toLowerCase().replace(/[^a-z0-9]/g, '-') }}"
+                        },
+                        {
+                            "fieldId": "address",
+                            "value": "={{ $json.formatted_address }}"
+                        },
+                        {
+                            "fieldId": "status",
+                            "value": "lead"
+                        },
+                        {
+                            "fieldId": "source_url",
+                            "value": "google_maps"
+                        },
+                        {
+                            "fieldId": "tier_subscription",
+                            "value": "basic"
+                        },
+                        {
+                            "fieldId": "is_verified",
+                            "value": false
+                        }
+                    ]
+                }
+            },
+            "id": "e0d0c350-save-0004b",
+            "name": "Save Agency Lead",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                980,
+                300
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "YOUR_SUPABASE_ID",
+                    "name": "Supabase Account"
+                }
+            }
+        },
+        {
+            "parameters": {
                 "url": "https://api.groq.com/openai/v1/chat/completions",
                 "method": "POST",
                 "authentication": "genericCredentialType",
@@ -168,6 +219,17 @@
             ]
         },
         "Filter: Deficient": {
+            "main": [
+                [
+                    {
+                        "node": "Save Agency Lead",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Save Agency Lead": {
             "main": [
                 [
                     {
