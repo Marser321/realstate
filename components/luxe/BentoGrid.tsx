@@ -25,14 +25,62 @@ interface BentoGridProps {
     title?: string;
     subtitle?: string;
     onPropertyHover?: (id: string | number | null) => void;
+    isLoading?: boolean;
+}
+
+// Skeleton pulsante estilo Airbnb
+function PropertyCardSkeleton({ index }: { index: number }) {
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.05, duration: 0.4 }}
+            className="bg-card rounded-2xl overflow-hidden border border-border/50"
+        >
+            {/* Image skeleton */}
+            <div className="aspect-[4/3] bg-gradient-to-r from-muted via-muted/80 to-muted animate-pulse relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skeleton-shimmer" />
+            </div>
+
+            {/* Content skeleton */}
+            <div className="p-5 space-y-4">
+                <div className="flex justify-between items-start">
+                    <div className="space-y-2 flex-1">
+                        {/* Title */}
+                        <div className="h-6 bg-muted rounded-lg w-3/4 animate-pulse" />
+                        {/* Location */}
+                        <div className="h-4 bg-muted/70 rounded w-1/2 animate-pulse" />
+                    </div>
+                    {/* Price */}
+                    <div className="space-y-1 text-right">
+                        <div className="h-6 bg-muted rounded-lg w-24 animate-pulse" />
+                        <div className="h-3 bg-muted/50 rounded w-12 ml-auto animate-pulse" />
+                    </div>
+                </div>
+
+                {/* Divider */}
+                <div className="h-px bg-border" />
+
+                {/* Specs */}
+                <div className="flex justify-between">
+                    <div className="h-4 bg-muted/60 rounded w-16 animate-pulse" />
+                    <div className="h-4 bg-muted/60 rounded w-16 animate-pulse" />
+                    <div className="h-4 bg-muted/60 rounded w-16 animate-pulse" />
+                </div>
+            </div>
+        </motion.div>
+    );
 }
 
 export function BentoGrid({
     properties,
     title = "Propiedades Destacadas",
     subtitle = "Selección curada de propiedades exclusivas",
-    onPropertyHover
+    onPropertyHover,
+    isLoading = false
 }: BentoGridProps) {
+    const showSkeleton = isLoading || properties.length === 0;
+
     return (
         <section className="py-24 bg-background">
             <div className="container mx-auto px-6">
@@ -58,31 +106,27 @@ export function BentoGrid({
                     </button>
                 </motion.div>
 
-                {/* Bento Grid Layout */}
+                {/* Grid Layout */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {properties.map((property, index) => (
-                        <PropertyCard
-                            key={property.id}
-                            property={property}
-                            index={index}
-                            onHover={onPropertyHover}
-                        />
-                    ))}
+                    {showSkeleton ? (
+                        // Skeleton loading state
+                        Array.from({ length: 6 }).map((_, index) => (
+                            <PropertyCardSkeleton key={`skeleton-${index}`} index={index} />
+                        ))
+                    ) : (
+                        // Property cards
+                        properties.map((property, index) => (
+                            <PropertyCard
+                                key={property.id}
+                                property={property}
+                                index={index}
+                                onHover={onPropertyHover}
+                            />
+                        ))
+                    )}
                 </div>
-
-                {/* Empty State */}
-                {properties.length === 0 && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="text-center py-16 bg-muted/50 rounded-2xl border border-dashed border-border"
-                    >
-                        <p className="text-muted-foreground font-serif text-xl italic">
-                            Cargando propiedades exclusivas...
-                        </p>
-                    </motion.div>
-                )}
             </div>
         </section>
     );
 }
+

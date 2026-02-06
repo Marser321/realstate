@@ -28,17 +28,17 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  
+
   /* Luxe Gold */
   --color-gold: var(--gold);
   --color-gold-light: var(--gold-light);
   --color-gold-dark: var(--gold-dark);
-  
+
   /* Fonts */
   --font-sans: var(--font-inter);
   --font-serif: var(--font-playfair);
   --font-mono: var(--font-geist-mono);
-  
+
   /* Radius */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -52,39 +52,42 @@
 :root {
   /* Base Radius */
   --radius: 0.625rem;
-  
+
   /* Luxe Estate Palette */
-  --background: #FAFAFA;          /* Alabaster White */
-  --foreground: #0A0A0A;          /* Onyx Black */
-  --accent: #D4AF37;              /* Champagne Gold */
+  --background: #FAFAFA;
+  /* Alabaster White */
+  --foreground: #0A0A0A;
+  /* Onyx Black */
+  --accent: #D4AF37;
+  /* Champagne Gold */
   --gold: #D4AF37;
   --gold-light: #E8D48A;
   --gold-dark: #B8942F;
-  
+
   /* Card & Surfaces */
   --card: #FFFFFF;
   --card-foreground: #0A0A0A;
   --popover: #FFFFFF;
   --popover-foreground: #0A0A0A;
-  
+
   /* Primary = Gold */
   --primary: #D4AF37;
   --primary-foreground: #FFFFFF;
-  
+
   /* Secondary = Muted */
   --secondary: #F5F5F0;
   --secondary-foreground: #0A0A0A;
-  
+
   /* Muted Tones */
   --muted: #F5F5F0;
   --muted-foreground: #6B6B6B;
-  
+
   /* Accent styling */
   --accent-foreground: #FFFFFF;
-  
+
   /* Destructive */
   --destructive: #DC2626;
-  
+
   /* Borders & Inputs */
   --border: #E5E5E0;
   --input: #E5E5E0;
@@ -116,18 +119,32 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground antialiased;
+    background-image: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.03) 0%, transparent 50%);
   }
-  
+
+  ::selection {
+    background-color: rgba(212, 175, 55, 0.2);
+    color: #0A0A0A;
+  }
+
   /* Typography */
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     font-family: var(--font-playfair), 'Playfair Display', Georgia, serif;
     font-weight: 700;
     letter-spacing: -0.02em;
   }
-  
-  p, span, div, input, button {
+
+  p,
+  span,
+  div,
+  input,
+  button {
     font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
   }
 }
@@ -137,73 +154,75 @@
    ============================================ */
 
 @layer components {
+
   /* Glassmorphism Card */
   .glass-card {
     @apply bg-white/80 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-xl;
   }
-  
+
   /* Hover Glow Effect for Buttons */
   .btn-luxe {
     @apply relative overflow-hidden transition-all duration-300;
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
   }
-  
+
   .btn-luxe::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at center, rgba(255,255,255,0.3) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
     opacity: 0;
     transition: opacity 0.3s ease;
   }
-  
+
   .btn-luxe:hover::before {
     opacity: 1;
   }
-  
+
   .btn-luxe:hover {
     box-shadow: 0 0 30px rgba(212, 175, 55, 0.4), 0 0 60px rgba(212, 175, 55, 0.2);
     transform: translateY(-2px);
   }
-  
+
   /* Property Card Hover Effect */
   .property-card {
     @apply relative overflow-hidden rounded-xl transition-all duration-500;
   }
-  
+
   .property-card:hover {
-    @apply shadow-2xl -translate-y-2;
+    @apply -translate-y-2;
+    box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.1), 0 0 20px -3px rgba(212, 175, 55, 0.15);
   }
-  
+
   .property-card:hover .property-card-image {
     @apply scale-110;
   }
-  
+
   .property-card-image {
     @apply transition-transform duration-700 ease-out;
   }
-  
+
   /* Sticky Sidebar */
   .sticky-sidebar {
     @apply sticky top-24;
   }
-  
+
   /* Gold Accent Underline */
   .gold-underline {
     @apply relative inline-block;
   }
-  
+
   .gold-underline::after {
     content: '';
     @apply absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-gold to-gold-light;
   }
-  
+
   /* Scrollbar Hide */
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
@@ -214,41 +233,61 @@
    ============================================ */
 
 @layer utilities {
+
   /* Smooth entrance */
   .animate-in {
     animation: fadeIn 0.6s ease-out forwards;
   }
-  
+
   @keyframes fadeIn {
     from {
       opacity: 0;
       transform: translateY(20px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
     }
   }
-  
+
   /* Parallax helper */
   .parallax-slow {
     will-change: transform;
   }
-  
+
   /* Gold shimmer effect */
   .shimmer-gold {
-    background: linear-gradient(
-      90deg,
-      var(--gold) 0%,
-      var(--gold-light) 50%,
-      var(--gold) 100%
-    );
+    background: linear-gradient(90deg,
+        var(--gold) 0%,
+        var(--gold-light) 50%,
+        var(--gold) 100%);
     background-size: 200% 100%;
     animation: shimmer 2s infinite;
   }
-  
+
   @keyframes shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+    0% {
+      background-position: 200% 0;
+    }
+
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  /* Skeleton shimmer effect for loading cards */
+  .skeleton-shimmer {
+    animation: skeletonShimmer 1.5s ease-in-out infinite;
+  }
+
+  @keyframes skeletonShimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+
+    100% {
+      transform: translateX(100%);
+    }
   }
 }

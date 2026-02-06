@@ -21,36 +21,36 @@ export function HeroSection() {
                     className="absolute inset-0 w-full h-full object-cover"
                 >
                     {/* Video placeholder - replace with actual drone footage */}
-                    <source src="/videos/drone-mansions.mp4" type="video/mp4" />
+                    {/* <source src="/videos/drone-mansions.mp4" type="video/mp4" /> */}
                 </video>
 
-                {/* Dark Overlay 20% */}
-                <div className="absolute inset-0 bg-black/20" />
+                {/* Dark Overlay 30% for better text contrast */}
+                <div className="absolute inset-0 bg-black/30" />
 
                 {/* Gradient overlay for text readability */}
-                <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/70" />
             </div>
 
             {/* Header Navigation */}
             <header className="absolute top-0 left-0 right-0 z-50">
                 <nav className="container mx-auto px-6 py-6 flex justify-between items-center">
-                    <Link href="/" className="flex items-center">
-                        <h1 className="text-2xl md:text-3xl font-serif font-bold text-white tracking-tight">
+                    <Link href="/" className="flex items-center group">
+                        <h1 className="text-2xl md:text-3xl font-serif font-bold text-white tracking-tight transition-transform group-hover:scale-105">
                             Luxe<span className="text-[#D4AF37]">Estate</span>
                         </h1>
                     </Link>
 
                     <div className="hidden md:flex items-center gap-8">
-                        <Link href="/propiedades" className="text-white/90 hover:text-white transition-colors font-medium">
+                        <Link href="/search" className="text-white/90 hover:text-[#D4AF37] transition-colors font-medium text-sm tracking-wide">
                             Propiedades
                         </Link>
-                        <Link href="/mapa" className="text-white/90 hover:text-white transition-colors font-medium">
+                        <Link href="/search" className="text-white/90 hover:text-[#D4AF37] transition-colors font-medium text-sm tracking-wide">
                             Mapa
                         </Link>
-                        <Link href="/agentes" className="text-white/90 hover:text-white transition-colors font-medium">
+                        <Link href="/partners" className="text-white/90 hover:text-[#D4AF37] transition-colors font-medium text-sm tracking-wide">
                             Inmobiliarias
                         </Link>
-                        <button className="btn-luxe px-6 py-2.5 rounded-full text-white font-semibold">
+                        <button className="btn-luxe px-6 py-2.5 rounded-full text-white font-bold text-sm tracking-wide shadow-lg hover:shadow-[#D4AF37]/20">
                             Publicar
                         </button>
                     </div>
@@ -58,31 +58,33 @@ export function HeroSection() {
             </header>
 
             {/* Hero Content */}
-            <div className="relative z-20 flex flex-col items-center justify-center h-full px-4">
+            <div className="relative z-20 flex flex-col items-center justify-center h-full px-4 pt-20">
                 <motion.div
                     initial={{ opacity: 0, y: 40 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                    className="text-center max-w-4xl"
+                    className="text-center max-w-5xl"
                 >
                     {/* Tagline */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2, duration: 0.6 }}
-                        className="flex items-center justify-center gap-2 mb-6"
+                        className="flex items-center justify-center gap-2 mb-8"
                     >
-                        <Sparkles className="w-5 h-5 text-[#D4AF37]" />
-                        <span className="text-[#D4AF37] font-medium tracking-wider uppercase text-sm">
-                            Búsqueda Inteligente con IA
-                        </span>
+                        <div className="px-4 py-1.5 rounded-full border border-[#D4AF37]/30 bg-black/20 backdrop-blur-md flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-[#D4AF37]" />
+                            <span className="text-[#D4AF37] font-semibold tracking-widest uppercase text-xs">
+                                Real Estate de Lujo
+                            </span>
+                        </div>
                     </motion.div>
 
                     {/* Main Headline */}
-                    <h2 className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-[1.1] tracking-tight">
+                    <h2 className="font-serif text-6xl md:text-8xl lg:text-9xl font-bold text-white mb-8 leading-[1.1] tracking-tighter drop-shadow-2xl">
                         Encuentra tu
                         <br />
-                        <span className="bg-gradient-to-r from-[#D4AF37] to-[#E8D48A] bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-[#D4AF37] via-[#F4E4BC] to-[#D4AF37] bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
                             hogar ideal
                         </span>
                     </h2>
@@ -92,9 +94,9 @@ export function HeroSection() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4, duration: 0.6 }}
-                        className="text-xl md:text-2xl text-white/80 font-light mb-12 max-w-2xl mx-auto"
+                        className="text-xl md:text-3xl text-white/90 font-light mb-16 max-w-3xl mx-auto leading-relaxed"
                     >
-                        Propiedades exclusivas en Punta del Este, La Barra y José Ignacio
+                        La colección más exclusiva de propiedades en Punta del Este, La Barra y José Ignacio.
                     </motion.p>
                 </motion.div>
 

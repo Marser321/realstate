@@ -1,10 +1,10 @@
 import { Suspense } from 'react'
-import DashboardContent from './DashboardContent'
+import LoginContent from './LoginContent'
 
-// Force dynamic rendering for dashboard with auth
+// Force dynamic for secure login flow
 export const dynamic = 'force-dynamic'
 
-function DashboardLoading() {
+function LoginLoading() {
     return (
         <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
             <div className="w-8 h-8 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
@@ -12,10 +12,10 @@ function DashboardLoading() {
     )
 }
 
-export default function DashboardPage() {
+export default function LoginPage() {
     return (
-        <Suspense fallback={<DashboardLoading />}>
-            <DashboardContent />
+        <Suspense fallback={<LoginLoading />}>
+            <LoginContent />
         </Suspense>
     )
 }

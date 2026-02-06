@@ -1,296 +1,148 @@
-// @regression-guard-locked: Scrollytelling Property Detail v2.0
+import { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+import { createClient } from '@supabase/supabase-js'
+import PropertyDetailClient from './PropertyDetailClient'
 
-'use client';
+// Server-side Supabase client
+const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { MapPin, Bed, Bath, Home, Share, Heart, Phone, MessageCircle } from "lucide-react";
-import { motion } from "framer-motion";
-import { ParallaxGallery } from "@/components/luxe/ParallaxGallery";
-import { ScrollRevealSection, StickySidebar, FeatureReveal, TextReveal } from "@/components/luxe/ScrollAnimations";
-import { InvestmentPotential } from "@/components/property/InvestmentPotential";
-import Link from "next/link";
+interface PropertyPageProps {
+    params: Promise<{ id: string }>
+}
 
-// Mock property data - Replace with real data fetching
-const PROPERTY = {
-    id: 1,
-    title: "Villa Marítima La Barra",
-    location: "La Barra, Montoya Beach",
-    badge: "Exclusiva",
-    price: 2500000,
-    currency: "USD",
-    bedrooms: 5,
-    bathrooms: 6,
-    builtArea: 450,
-    plotArea: 1200,
-    yearBuilt: 2021,
-    description: [
-        "Situada en el corazón de La Barra, a pasos de las olas de Montoya, 'Villa Marítima' representa el pináculo del lujo de verano. Diseñada por el reconocido arquitecto Martín Gómez Arquitectos, esta propiedad fusiona la vida interior y exterior de manera impecable.",
-        "Las características incluyen una piscina infinita climatizada, cocina de grado profesional y una suite principal con vistas panorámicas al océano. El jardín paisajístico ofrece privacidad absoluta mientras está a minutos de la vibrante vida nocturna y gastronomía de La Barra."
-    ],
-    amenities: ['Vista al Mar', 'Piscina Climatizada', 'Casa de Huéspedes', 'Chimenea', 'Smart Home', 'Cava de Vinos', 'Parrilla', 'Seguridad 24/7'],
-    images: [
-        { src: '/images/placeholders/luxury-villa.jpg', alt: 'Vista Principal' },
-        { src: '/images/placeholders/interior-view.jpg', alt: 'Interior' },
-        { src: '/images/placeholders/modern-apartment.jpg', alt: 'Cocina' },
-        { src: '/images/placeholders/interior-living.jpg', alt: 'Living' },
-        { src: '/images/placeholders/beach-house.jpg', alt: 'Vista al Mar' },
-    ],
-    agent: {
-        name: "Santiago Roberts",
-        title: "Senior Partner",
-        phone: "+598 99 123 456",
-        whatsapp: "59899123456",
-        avatar: "/images/placeholders/agent-profile.jpg"
+// Fetch property data
+async function getProperty(id: string) {
+    const { data, error } = await supabase
+        .from('properties')
+        .select(`
+            *,
+            location:locations(name, slug),
+            agency:agencies(name, slug, whatsapp, contact_phone)
+        `)
+        .eq('id', id)
+        .single()
+
+    if (error || !data) return null
+    return data
+}
+
+// SEO: Generate dynamic metadata
+// Format: [Type] en [Neighborhood] - [Price] | Luxe Estate
+export async function generateMetadata({ params }: PropertyPageProps): Promise<Metadata> {
+    const { id } = await params
+    const property = await getProperty(id)
+
+    if (!property) {
+        return {
+            title: 'Propiedad no encontrada | Luxe Estate',
+        }
     }
-};
 
-export default function PropertyDetailPage() {
-    const formatPrice = (price: number) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format(price);
-    };
+    // Format price
+    const formattedPrice = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: property.currency || 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    }).format(property.price)
 
-    return (
-        <div className="bg-background min-h-screen text-foreground">
-            {/* FLOATING HEADER */}
-            <motion.nav
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 py-4"
-            >
-                <div className="backdrop-blur-md bg-black/30 rounded-full px-6 py-3">
-                    <Link href="/" className="font-serif font-bold text-xl tracking-tight text-white">
-                        Luxe<span className="text-[#D4AF37]">Estate</span>
-                    </Link>
-                </div>
-                <div className="flex gap-2">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="backdrop-blur-md bg-white/10 hover:bg-white/20 text-white rounded-full"
-                    >
-                        <Share className="w-5 h-5" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="backdrop-blur-md bg-white/10 hover:bg-white/20 text-white rounded-full"
-                    >
-                        <Heart className="w-5 h-5" />
-                    </Button>
-                </div>
-            </motion.nav>
+    // Get property type from status
+    const typeMap: Record<string, string> = {
+        'for_sale': 'Casa en Venta',
+        'for_rent': 'Casa en Alquiler',
+        'sold': 'Vendida',
+        'rented': 'Alquilada',
+    }
+    const propertyType = typeMap[property.status || 'for_sale'] || 'Propiedad'
 
-            {/* PARALLAX GALLERY */}
-            <ParallaxGallery
-                images={PROPERTY.images}
-                title={PROPERTY.title}
-                location={PROPERTY.location}
-                badge={PROPERTY.badge}
-            />
+    // Location name
+    const locationName = property.location?.name || 'Uruguay'
 
-            {/* MAIN CONTENT */}
-            <div className="container mx-auto px-6 py-16">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+    // Build title: [Type] en [Neighborhood] - [Price] | Luxe Estate
+    const title = `${propertyType} en ${locationName} - ${formattedPrice} | Luxe Estate`
 
-                    {/* LEFT COLUMN - Details */}
-                    <div className="lg:col-span-7 space-y-16">
+    // Build description
+    const description = property.description
+        ? property.description.slice(0, 160) + '...'
+        : `${propertyType} en ${locationName}. ${property.bedrooms || 0} dormitorios, ${property.bathrooms || 0} baños. ${formattedPrice}`
 
-                        {/* Key Stats with Animation */}
-                        <ScrollRevealSection>
-                            <div className="flex flex-wrap gap-8 py-8 border-b border-border">
-                                {[
-                                    { icon: Bed, label: 'Dormitorios', value: `${PROPERTY.bedrooms} Suites` },
-                                    { icon: Bath, label: 'Baños', value: `${PROPERTY.bathrooms} Completos` },
-                                    { icon: Home, label: 'Área Construida', value: `${PROPERTY.builtArea} m²` },
-                                ].map((stat, index) => (
-                                    <motion.div
-                                        key={stat.label}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        whileInView={{ opacity: 1, y: 0 }}
-                                        viewport={{ once: true }}
-                                        transition={{ delay: index * 0.1 }}
-                                        className="flex items-center gap-4"
-                                    >
-                                        <div className="p-4 bg-muted rounded-2xl text-[#D4AF37]">
-                                            <stat.icon className="w-6 h-6" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm text-muted-foreground font-medium">{stat.label}</p>
-                                            <p className="text-lg font-bold">{stat.value}</p>
-                                        </div>
-                                    </motion.div>
-                                ))}
-                            </div>
-                        </ScrollRevealSection>
+    // Build OG image URL with property details
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://realstate-nu.vercel.app'
+    const ogParams = new URLSearchParams({
+        title: property.title,
+        price: formattedPrice,
+        location: locationName,
+        bedrooms: (property.bedrooms || 0).toString(),
+        bathrooms: (property.bathrooms || 0).toString(),
+        area: (property.built_area || 0).toString(),
+        ...(property.main_image && { image: property.main_image }),
+    })
+    const ogImageUrl = `${baseUrl}/api/og?${ogParams.toString()}`
 
-                        {/* Description with Text Reveal */}
-                        <ScrollRevealSection delay={0.1}>
-                            <div className="space-y-6">
-                                <h2 className="text-3xl md:text-4xl font-serif font-bold">
-                                    Vida Costera Refinada
-                                </h2>
-                                {PROPERTY.description.map((paragraph, index) => (
-                                    <TextReveal
-                                        key={index}
-                                        text={paragraph}
-                                        className="text-muted-foreground leading-relaxed text-lg"
-                                    />
-                                ))}
-                            </div>
-                        </ScrollRevealSection>
+    return {
+        title,
+        description,
+        openGraph: {
+            title,
+            description,
+            type: 'website',
+            url: `${baseUrl}/property/${id}`,
+            images: [
+                {
+                    url: ogImageUrl,
+                    width: 1200,
+                    height: 630,
+                    alt: property.title,
+                },
+            ],
+            siteName: 'Luxe Estate',
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title,
+            description,
+            images: [ogImageUrl],
+        },
+    }
+}
 
-                        {/* Investment Potential Section */}
-                        <ScrollRevealSection delay={0.15}>
-                            <InvestmentPotential />
-                        </ScrollRevealSection>
+export default async function PropertyPage({ params }: PropertyPageProps) {
+    const { id } = await params
+    const property = await getProperty(id)
 
-                        {/* Amenities with Feature Reveal */}
-                        <ScrollRevealSection delay={0.2}>
-                            <div>
-                                <h3 className="text-2xl font-serif font-bold mb-8">Amenidades</h3>
-                                <FeatureReveal features={PROPERTY.amenities} />
-                            </div>
-                        </ScrollRevealSection>
+    if (!property) {
+        notFound()
+    }
 
-                        {/* Property Details Grid */}
-                        <ScrollRevealSection delay={0.3}>
-                            <div className="bg-muted/50 rounded-2xl p-8">
-                                <h3 className="text-2xl font-serif font-bold mb-6">Detalles de la Propiedad</h3>
-                                <div className="grid grid-cols-2 gap-6">
-                                    {[
-                                        { label: 'Área del Terreno', value: `${PROPERTY.plotArea} m²` },
-                                        { label: 'Área Construida', value: `${PROPERTY.builtArea} m²` },
-                                        { label: 'Año de Construcción', value: PROPERTY.yearBuilt },
-                                        { label: 'Estado', value: 'En Venta' },
-                                    ].map((detail) => (
-                                        <div key={detail.label}>
-                                            <p className="text-sm text-muted-foreground">{detail.label}</p>
-                                            <p className="font-bold text-lg">{detail.value}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </ScrollRevealSection>
+    // Transform data for client component
+    const clientData = {
+        id: property.id,
+        title: property.title,
+        location: property.location?.name || 'Uruguay',
+        badge: property.is_featured ? 'Destacada' : (property.status === 'for_sale' ? 'En Venta' : 'En Alquiler'),
+        price: property.price,
+        currency: property.currency || 'USD',
+        bedrooms: property.bedrooms || 0,
+        bathrooms: property.bathrooms || 0,
+        builtArea: property.built_area || 0,
+        plotArea: property.plot_area || 0,
+        description: property.description ? [property.description] : [],
+        amenities: Array.isArray(property.lifestyle_tags) ? property.lifestyle_tags : [],
+        images: property.images?.map((src: string, i: number) => ({
+            src,
+            alt: `${property.title} - Imagen ${i + 1}`
+        })) || (property.main_image ? [{ src: property.main_image, alt: property.title }] : []),
+        agent: {
+            name: property.agency?.name || 'Luxe Estate',
+            title: 'Asesor Inmobiliario',
+            phone: property.agency?.contact_phone || '',
+            whatsapp: property.agency?.whatsapp || '',
+            avatar: '/images/placeholders/agent-profile.jpg',
+        },
+    }
 
-                        {/* Map Section */}
-                        <ScrollRevealSection delay={0.4}>
-                            <div>
-                                <h3 className="text-2xl font-serif font-bold mb-6">Ubicación</h3>
-                                <div className="h-80 bg-muted rounded-2xl relative overflow-hidden flex items-center justify-center">
-                                    <MapPin className="w-12 h-12 text-muted-foreground/30" />
-                                    <span className="absolute bottom-4 text-muted-foreground text-sm">
-                                        Ubicación aproximada por privacidad
-                                    </span>
-                                </div>
-                            </div>
-                        </ScrollRevealSection>
-
-                    </div>
-
-                    {/* RIGHT COLUMN - Sticky Sidebar */}
-                    <div className="lg:col-span-5">
-                        <StickySidebar topOffset={100}>
-
-                            {/* Price Card */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.6 }}
-                                className="p-8 rounded-3xl border border-border shadow-2xl bg-card"
-                            >
-                                <div className="flex justify-between items-start mb-8">
-                                    <div>
-                                        <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">
-                                            Precio de Venta
-                                        </p>
-                                        <h2 className="text-4xl md:text-5xl font-serif font-bold mt-2">
-                                            {formatPrice(PROPERTY.price)}
-                                        </h2>
-                                    </div>
-                                    <Badge variant="gold" className="text-sm">
-                                        {PROPERTY.badge}
-                                    </Badge>
-                                </div>
-
-                                <div className="space-y-3">
-                                    <Button className="w-full bg-[#D4AF37] hover:bg-[#B8942F] text-white h-14 text-lg font-semibold rounded-xl">
-                                        <Phone className="w-5 h-5 mr-2" />
-                                        Agendar Visita
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        className="w-full h-14 border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white rounded-xl text-lg font-semibold"
-                                        asChild
-                                    >
-                                        <a href={`https://wa.me/${PROPERTY.agent.whatsapp}?text=Hola! Me interesa la propiedad ${PROPERTY.title}`} target="_blank" rel="noopener noreferrer">
-                                            <MessageCircle className="w-5 h-5 mr-2" />
-                                            WhatsApp
-                                        </a>
-                                    </Button>
-                                </div>
-                            </motion.div>
-
-                            {/* Agent Card */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.7 }}
-                                className="bg-muted rounded-2xl p-6 flex items-center gap-5"
-                            >
-                                <div className="w-20 h-20 bg-muted-foreground/20 rounded-full overflow-hidden ring-2 ring-[#D4AF37] ring-offset-2 ring-offset-background">
-                                    <img
-                                        src={PROPERTY.agent.avatar}
-                                        alt={PROPERTY.agent.name}
-                                        className="w-full h-full object-cover"
-                                    />
-                                </div>
-                                <div>
-                                    <p className="text-sm text-muted-foreground font-medium">Tu asesor</p>
-                                    <h4 className="font-bold text-xl">{PROPERTY.agent.name}</h4>
-                                    <p className="text-[#D4AF37] font-medium">{PROPERTY.agent.title}</p>
-                                </div>
-                            </motion.div>
-
-                        </StickySidebar>
-                    </div>
-
-                </div>
-            </div>
-
-            {/* BACK TO TOP / FOOTER SPACER */}
-            <div className="h-32 lg:h-12" />
-
-            {/* MOBILE STICKY CTA BAR */}
-            <motion.div
-                initial={{ y: 100 }}
-                animate={{ y: 0 }}
-                transition={{ delay: 1 }}
-                className="fixed bottom-0 left-0 right-0 bg-background/90 backdrop-blur-xl border-t border-border p-4 pb-8 z-50 lg:hidden shadow-[0_-5px_20px_rgba(0,0,0,0.1)]"
-            >
-                <div className="flex items-center gap-4">
-                    <div className="flex-1">
-                        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Precio</p>
-                        <p className="text-2xl font-serif font-bold text-foreground">{formatPrice(PROPERTY.price)}</p>
-                    </div>
-                    <Button
-                        size="lg"
-                        className="bg-[#D4AF37] hover:bg-[#B8942F] text-white rounded-xl shadow-lg shadow-[#D4AF37]/20"
-                        asChild
-                    >
-                        <a href={`https://wa.me/${PROPERTY.agent.whatsapp}?text=Hola! Me interesa la propiedad ${PROPERTY.title}`} target="_blank" rel="noopener noreferrer">
-                            <MessageCircle className="w-5 h-5 mr-2" />
-                            WhatsApp
-                        </a>
-                    </Button>
-                </div>
-            </motion.div>
-        </div>
-    );
+    return <PropertyDetailClient property={clientData} />
 }

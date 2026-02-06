@@ -1,10 +1,11 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Bed, Bath, Maximize2, Heart } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useFavorites } from '@/hooks/useFavorites';
 
 interface Property {
     id: number | string;
@@ -28,11 +29,18 @@ interface PropertyCardProps {
     index?: number;
 }
 
+// Placeholder blur base64 para blur-up effect (gris suave)
+const BLUR_PLACEHOLDER = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUH/8QAIhAAAQMDBAMBAAAAAAAAAAAAAQIDBAAFEQYSITEHE0FR/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAZEQADAQEBAAAAAAAAAAAAAAAAAQIDESH/2gAMAwEAAhEDEEEA/9oAzAeJLAuVwuMm4XJC21LUptDYBSgeAD9q60UjyGPQ14lkqf/Z';
+
 export function PropertyCard({ property, onHover, index = 0 }: PropertyCardProps) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isHovered, setIsHovered] = useState(false);
-    const [isFavorite, setIsFavorite] = useState(false);
+    const [imageLoaded, setImageLoaded] = useState(false);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Hook de favoritos con persistencia localStorage
+    const { isFavorite, toggleFavorite } = useFavorites();
+    const isPropertyFavorite = isFavorite(property.id);
 
     const images = property.images?.length ? property.images : [property.main_image];
 
@@ -76,13 +84,22 @@ export function PropertyCard({ property, onHover, index = 0 }: PropertyCardProps
         >
             <Link href={`/property/${property.id}`}>
                 <article
-                    className="property-card group bg-card rounded-2xl overflow-hidden border border-border/50 hover:border-[#D4AF37]/30 transition-all duration-500"
+                    className="property-card group bg-card rounded-2xl overflow-hidden border border-border/50 hover:border-[#D4AF37]/30 hover:shadow-xl hover:shadow-black/10 hover:-translate-y-1 transition-all duration-500"
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                 >
                     {/* Image Container - 70% height for Bento style */}
                     <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-                        {/* Main Image with Slideshow */}
+                        {/* Blur Placeholder Background */}
+                        <div
+                            className="absolute inset-0 bg-cover bg-center blur-xl scale-110 transition-opacity duration-700"
+                            style={{
+                                backgroundImage: `url(${BLUR_PLACEHOLDER})`,
+                                opacity: imageLoaded ? 0 : 1
+                            }}
+                        />
+
+                        {/* Main Image with Slideshow + Blur-up Effect */}
                         <div className="absolute inset-0">
                             {images.map((img, i) => (
                                 <Image
@@ -91,9 +108,10 @@ export function PropertyCard({ property, onHover, index = 0 }: PropertyCardProps
                                     alt={`${property.title} - Image ${i + 1}`}
                                     fill
                                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                    className={`object-cover property-card-image transition-opacity duration-500 ${i === currentImageIndex ? 'opacity-100' : 'opacity-0'
-                                        }`}
+                                    className={`object-cover property-card-image transition-all duration-700 ${i === currentImageIndex ? 'opacity-100' : 'opacity-0'
+                                        } ${imageLoaded ? 'blur-0 scale-100' : 'blur-sm scale-105'}`}
                                     priority={index < 2}
+                                    onLoad={() => setImageLoaded(true)}
                                 />
                             ))}
                         </div>
@@ -103,24 +121,27 @@ export function PropertyCard({ property, onHover, index = 0 }: PropertyCardProps
 
                         {/* Status Badge */}
                         <div className="absolute top-4 left-4 z-10">
-                            <span className="px-3 py-1.5 bg-white/95 backdrop-blur-sm text-xs font-bold uppercase tracking-wider text-foreground rounded-sm">
+                            <span className="px-3 py-1.5 bg-black/80 backdrop-blur-md border border-[#D4AF37]/50 text-xs font-bold uppercase tracking-wider text-white rounded-sm shadow-lg">
                                 {property.status?.replace('_', ' ') || 'En Venta'}
                             </span>
                         </div>
 
-                        {/* Favorite Button */}
-                        <button
+                        {/* Favorite Button with Heartbeat Animation */}
+                        <motion.button
                             onClick={(e) => {
                                 e.preventDefault();
-                                setIsFavorite(!isFavorite);
+                                e.stopPropagation();
+                                toggleFavorite(property.id);
                             }}
-                            className={`absolute top-4 right-4 z-10 p-2.5 rounded-full backdrop-blur-sm transition-all duration-300 ${isFavorite
-                                ? 'bg-[#D4AF37] text-white'
+                            whileTap={{ scale: [1, 1.3, 0.9, 1.15, 1] }}
+                            transition={{ duration: 0.4 }}
+                            className={`absolute top-4 right-4 z-10 p-2.5 rounded-full backdrop-blur-sm transition-all duration-300 ${isPropertyFavorite
+                                ? 'bg-[#D4AF37] text-white scale-105'
                                 : 'bg-white/90 text-foreground hover:bg-[#D4AF37] hover:text-white'
                                 }`}
                         >
-                            <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
-                        </button>
+                            <Heart className={`w-4 h-4 transition-transform ${isPropertyFavorite ? 'fill-current' : ''}`} />
+                        </motion.button>
 
                         {/* Image Counter (on hover) */}
                         {images.length > 1 && isHovered && (
