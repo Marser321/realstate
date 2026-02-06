@@ -28,6 +28,7 @@ export interface Database {
                     is_verified: boolean
                     total_properties: number
                     total_views: number
+                    [key: string]: any
                 }
                 Insert: {
                     id?: number
@@ -47,6 +48,7 @@ export interface Database {
                     is_verified?: boolean
                     total_properties?: number
                     total_views?: number
+                    [key: string]: any
                 }
                 Update: {
                     id?: number
@@ -66,6 +68,7 @@ export interface Database {
                     is_verified?: boolean
                     total_properties?: number
                     total_views?: number
+                    [key: string]: any
                 }
             }
             agency_users: {
@@ -183,6 +186,7 @@ export interface Database {
                     lifestyle_tags: string[] | null
                     location_point: unknown | null // PostGIS geography
                     view_count: number
+                    [key: string]: any
                 }
                 Insert: {
                     id?: number
@@ -211,6 +215,7 @@ export interface Database {
                     lifestyle_tags?: string[] | null
                     location_point?: unknown | null
                     view_count?: number
+                    [key: string]: any
                 }
                 Update: {
                     id?: number
@@ -239,6 +244,7 @@ export interface Database {
                     lifestyle_tags?: string[] | null
                     location_point?: unknown | null
                     view_count?: number
+                    [key: string]: any
                 }
             }
             outreach_queue: {
@@ -255,6 +261,7 @@ export interface Database {
                     personalization_data: Json | null
                     attempts: number | null
                     last_error: string | null
+                    [key: string]: any
                 }
                 Insert: {
                     id?: string
@@ -269,6 +276,7 @@ export interface Database {
                     personalization_data?: Json | null
                     attempts?: number | null
                     last_error?: string | null
+                    [key: string]: any
                 }
                 Update: {
                     id?: string
@@ -283,6 +291,42 @@ export interface Database {
                     personalization_data?: Json | null
                     attempts?: number | null
                     last_error?: string | null
+                    [key: string]: any
+                }
+            }
+            outreach_log: {
+                Row: {
+                    id: string
+                    created_at: string
+                    lead_id: string
+                    queue_id: string | null
+                    channel: string
+                    direction: string
+                    content: string | null
+                    metadata: Json | null
+                    [key: string]: any
+                }
+                Insert: {
+                    id?: string
+                    created_at?: string
+                    lead_id: string
+                    queue_id?: string | null
+                    channel: string
+                    direction: string
+                    content?: string | null
+                    metadata?: Json | null
+                    [key: string]: any
+                }
+                Update: {
+                    id?: string
+                    created_at?: string
+                    lead_id?: string
+                    queue_id?: string | null
+                    channel?: string
+                    direction?: string
+                    content?: string | null
+                    metadata?: Json | null
+                    [key: string]: any
                 }
             }
             prospect_properties: {
@@ -311,6 +355,7 @@ export interface Database {
                     status: 'new' | 'qualified' | 'disqualified' | 'contacted' | 'converted' | null
                     disqualification_reason: string | null
                     meta: Json | null
+                    [key: string]: any
                 }
                 Insert: {
                     id?: string
@@ -337,6 +382,7 @@ export interface Database {
                     status?: 'new' | 'qualified' | 'disqualified' | 'contacted' | 'converted' | null
                     disqualification_reason?: string | null
                     meta?: Json | null
+                    [key: string]: any
                 }
                 Update: {
                     id?: string
@@ -363,6 +409,7 @@ export interface Database {
                     status?: 'new' | 'qualified' | 'disqualified' | 'contacted' | 'converted' | null
                     disqualification_reason?: string | null
                     meta?: Json | null
+                    [key: string]: any
                 }
             }
         }

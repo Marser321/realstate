@@ -25,7 +25,7 @@ export function useAuth() {
         const supabase = getSupabaseBrowserClient()
 
         // Get initial session
-        supabase.auth.getSession().then(({ data: { session } }) => {
+        supabase.auth.getSession().then(({ data: { session } }: any) => {
             setAuthState({
                 user: session?.user ?? null,
                 session,
@@ -35,7 +35,7 @@ export function useAuth() {
 
         // Subscribe to auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            (_event, session) => {
+            (_event: any, session: any) => {
                 setAuthState({
                     user: session?.user ?? null,
                     session,
@@ -94,7 +94,7 @@ export function useUserAgency() {
       `)
             .eq('user_id', user.id)
             .single()
-            .then(({ data, error }) => {
+            .then(({ data, error }: any) => {
                 if (error || !data) {
                     setAgency(null)
                 } else {

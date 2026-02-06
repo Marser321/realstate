@@ -121,15 +121,15 @@ export default function SniperDashboard() {
     const handleAction = async (id: string, action: string) => {
         // Implement status update logic
         if (action === 'approve') {
-            const { error: updateError } = await supabase
-                .from('prospect_properties')
-                .update({ status: 'qualified' })
-                .eq('id', id)
+            const { error: updateError } = await (supabase
+                .from('prospect_properties') as any)
+                .update({ status: 'qualified' } as any)
+                .eq('id', id) as any
 
             if (!updateError) {
                 // Insert into outreach queue to trigger N8N flow
-                await supabase
-                    .from('outreach_queue')
+                await (supabase
+                    .from('outreach_queue') as any)
                     .insert({
                         lead_id: id,
                         channel: 'whatsapp',
@@ -141,11 +141,11 @@ export default function SniperDashboard() {
             // Optimistic update
             setProspects(prev => prev.map(p => p.id === id ? { ...p, status: 'qualified' } : p))
         } else if (action === 'video_audit') {
-            await supabase.from('prospect_properties').update({ status: 'contacted' }).eq('id', id)
+            await (supabase.from('prospect_properties') as any).update({ status: 'contacted' }).eq('id', id)
             // Optimistic update
             setProspects(prev => prev.map(p => p.id === id ? { ...p, status: 'contacted' } : p))
         } else if (action === 'reject') {
-            await supabase.from('prospect_properties').update({ status: 'disqualified' }).eq('id', id)
+            await (supabase.from('prospect_properties') as any).update({ status: 'disqualified' }).eq('id', id)
             // Optimistic update
             setProspects(prev => prev.map(p => p.id === id ? { ...p, status: 'disqualified' } : p))
         }
