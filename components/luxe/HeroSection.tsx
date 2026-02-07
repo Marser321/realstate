@@ -2,9 +2,10 @@
 
 import { motion, useTransform, MotionValue } from 'framer-motion';
 import { Search, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { CanvasSequenceAnimator } from './CanvasSequenceAnimator';
+import { GoldenDust } from './GoldenDust';
 
 export function HeroSection() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -43,11 +44,14 @@ export function HeroSection() {
             ]}
         >
             {(scrollProgress: MotionValue<number>) => (
-                <HeroContent
-                    scrollProgress={scrollProgress}
-                    searchQuery={searchQuery}
-                    setSearchQuery={setSearchQuery}
-                />
+                <>
+                    <GoldenDust />
+                    <HeroContent
+                        scrollProgress={scrollProgress}
+                        searchQuery={searchQuery}
+                        setSearchQuery={setSearchQuery}
+                    />
+                </>
             )}
         </CanvasSequenceAnimator>
     );

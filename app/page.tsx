@@ -1,6 +1,6 @@
 // @regression-guard-locked: Luxe Estate v2.0 - Complete redesign
 
-import { HeroSequence } from "@/components/luxe/HeroSequence";
+import { HeroSection } from "@/components/luxe/HeroSection";
 import { BentoGrid } from "@/components/luxe/BentoGrid";
 import { LifestyleCategories } from "@/components/luxe/LifestyleCategories";
 import { MapWithListings } from "@/components/luxe/MapWithListings";
@@ -95,7 +95,7 @@ export default function Home() {
   return (
     <main className="flex flex-col min-h-screen bg-background text-foreground">
       {/* 1. HERO SECTION - Cinematic */}
-      <HeroSequence />
+      <HeroSection />
 
       {/* 2. LIFESTYLE CATEGORIES */}
       <LifestyleCategories />
