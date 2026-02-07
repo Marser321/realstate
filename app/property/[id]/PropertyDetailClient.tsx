@@ -97,6 +97,7 @@ export default function PropertyDetailClient({ property }: PropertyDetailClientP
                 title={property.title}
                 location={property.location}
                 badge={property.badge}
+                id={property.id}
             />
 
             {/* MAIN CONTENT */}

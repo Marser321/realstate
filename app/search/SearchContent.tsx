@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils"
 
 // Components
 import { SearchFilters } from "@/components/search/SearchFilters"
-import { PropertyCard } from "@/components/property/PropertyCard"
+import { PropertyCard } from "@/components/luxe/PropertyCard"
 import { PropertyCardSkeleton } from "@/components/property/PropertyCardSkeleton"
 import InteractiveMap from "@/components/features/interactive-map"
 

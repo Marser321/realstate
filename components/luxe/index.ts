@@ -7,3 +7,4 @@ export { Footer } from './Footer';
 export { MapWithListings } from './MapWithListings';
 export { ParallaxGallery } from './ParallaxGallery';
 export { ScrollRevealSection, StickySidebar, FeatureReveal, TextReveal } from './ScrollAnimations';
+export { CanvasSequenceAnimator } from './CanvasSequenceAnimator';

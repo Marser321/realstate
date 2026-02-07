@@ -1,157 +1,115 @@
 // @regression-guard-locked: Luxe Estate v2.0 - Complete redesign
 
-import { HeroSection } from "@/components/luxe/HeroSection";
+import { HeroSequence } from "@/components/luxe/HeroSequence";
 import { BentoGrid } from "@/components/luxe/BentoGrid";
 import { LifestyleCategories } from "@/components/luxe/LifestyleCategories";
 import { MapWithListings } from "@/components/luxe/MapWithListings";
 import { Footer } from "@/components/luxe/Footer";
-import { createClient } from "@/utils/supabase/server";
+
+// This would typically come from a database or API
+const FEATURED_PROPERTIES = [
+  {
+    id: 1,
+    title: "Villa Marítima Exclusiva",
+    price: 2500000,
+    currency: "USD",
+    bedrooms: 5,
+    bathrooms: 4,
+    built_area: 450,
+    location: "La Barra",
+    images: ["/images/prop1.jpg", "/images/prop1b.jpg"],
+    main_image: "/images/prop1.jpg",
+    status: "en_venta",
+    lifestyle_tags: ["Frente al Mar", "Diseño"]
+  },
+  {
+    id: 2,
+    title: "Penthouse en Punta",
+    price: 1200000,
+    currency: "USD",
+    bedrooms: 3,
+    bathrooms: 3,
+    built_area: 280,
+    location: "Punta del Este",
+    main_image: "/images/prop2.jpg",
+    status: "en_venta",
+    lifestyle_tags: ["Vistas", "Lujo"]
+  },
+  {
+    id: 3,
+    title: "Chacra en José Ignacio",
+    price: 3800000,
+    currency: "USD",
+    bedrooms: 6,
+    bathrooms: 5,
+    built_area: 600,
+    location: "José Ignacio",
+    main_image: "/images/prop3.jpg",
+    status: "en_venta",
+    lifestyle_tags: ["Naturaleza", "Privacidad"]
+  },
+  {
+    id: 4,
+    title: "Casa de Playa Moderna",
+    price: 1800000,
+    currency: "USD",
+    bedrooms: 4,
+    bathrooms: 4,
+    built_area: 350,
+    location: "Manantiales",
+    main_image: "/images/prop4.jpg",
+    status: "en_venta",
+    lifestyle_tags: ["Playa", "Surf"]
+  },
+  {
+    id: 5,
+    title: "Residencia del Golf",
+    price: 2100000,
+    currency: "USD",
+    bedrooms: 4,
+    bathrooms: 5,
+    built_area: 400,
+    location: "Golf",
+    main_image: "/images/prop5.jpg",
+    status: "en_venta",
+    lifestyle_tags: ["Golf", "Seguridad"]
+  },
+  {
+    id: 6,
+    title: "Apartamento Premium",
+    price: 950000,
+    currency: "USD",
+    bedrooms: 2,
+    bathrooms: 2,
+    built_area: 120,
+    location: "Peninsula",
+    main_image: "/images/prop6.jpg",
+    status: "en_venta",
+    lifestyle_tags: ["Céntrico", "Inversión"]
+  }
+];
 
 export const dynamic = "force-dynamic";
 
-export default async function Home() {
-  // 1. SAFETY CHECK: Do not attempt to create client if keys are missing
-  const hasSupabaseKeys = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  let properties: Array<{
-    id: number;
-    title: string;
-    price: number;
-    currency: string;
-    status: string;
-    bedrooms: number;
-    bathrooms: number;
-    built_area: number;
-    main_image: string;
-    images?: string[];
-    location?: string;
-    lifestyle_tags?: string[];
-  }> = [];
-
-  if (hasSupabaseKeys) {
-    try {
-      const supabase = await createClient();
-      const { data } = await supabase
-        .from('properties')
-        .select('*')
-        .eq('status', 'for_sale')
-        .limit(6);
-      properties = data || [];
-    } catch (e) {
-      console.error("Supabase fetch error:", e);
-    }
-  } else {
-    console.warn("⚠️ No Supabase keys found. Using Mock Data for demo.");
-  }
-
-  // 2. FALLBACK MOCK DATA (If DB is empty OR keys missing)
-  if (!properties || properties.length === 0) {
-    properties = [
-      {
-        id: 1,
-        title: 'Villa Marítima La Barra',
-        price: 2500000,
-        currency: 'USD',
-        status: 'for_sale',
-        bedrooms: 5,
-        bathrooms: 6,
-        built_area: 450,
-        main_image: '/images/placeholders/luxury-villa.jpg',
-        images: ['/images/placeholders/luxury-villa.jpg', '/images/placeholders/interior-living.jpg', '/images/placeholders/interior-view.jpg'],
-        location: 'La Barra, Montoya',
-        lifestyle_tags: ['Vista al Mar', 'Premium']
-      },
-      {
-        id: 2,
-        title: 'Chacra El Silencio',
-        price: 1800000,
-        currency: 'USD',
-        status: 'for_sale',
-        bedrooms: 4,
-        bathrooms: 4,
-        built_area: 320,
-        main_image: '/images/placeholders/farm-ranch.jpg',
-        images: ['/images/placeholders/farm-ranch.jpg', '/images/placeholders/interior-living.jpg'],
-        location: 'José Ignacio',
-        lifestyle_tags: ['Campo', 'Privacidad']
-      },
-      {
-        id: 3,
-        title: 'Skyline Penthouse',
-        price: 950000,
-        currency: 'USD',
-        status: 'for_sale',
-        bedrooms: 3,
-        bathrooms: 3,
-        built_area: 180,
-        main_image: '/images/placeholders/modern-apartment.jpg',
-        images: ['/images/placeholders/modern-apartment.jpg', '/images/placeholders/urban-penthouse.jpg'],
-        location: 'Punta del Este Centro',
-        lifestyle_tags: ['Urban', 'Vista Ciudad']
-      },
-      {
-        id: 4,
-        title: 'The Club Estate',
-        price: 3200000,
-        currency: 'USD',
-        status: 'for_sale',
-        bedrooms: 6,
-        bathrooms: 7,
-        built_area: 600,
-        main_image: '/images/placeholders/golf-estate.jpg',
-        images: ['/images/placeholders/golf-estate.jpg', '/images/placeholders/luxury-villa.jpg'],
-        location: 'Club del Lago',
-        lifestyle_tags: ['Golf', 'Exclusivo']
-      },
-      {
-        id: 5,
-        title: 'Beach House Montoya',
-        price: 1650000,
-        currency: 'USD',
-        status: 'for_sale',
-        bedrooms: 4,
-        bathrooms: 4,
-        built_area: 280,
-        main_image: '/images/placeholders/beach-house.jpg',
-        images: ['/images/placeholders/beach-house.jpg', '/images/placeholders/interior-view.jpg'],
-        location: 'Playa Montoya',
-        lifestyle_tags: ['Beachfront', 'Surf']
-      },
-      {
-        id: 6,
-        title: 'Urban Loft Gorlero',
-        price: 420000,
-        currency: 'USD',
-        status: 'for_sale',
-        bedrooms: 2,
-        bathrooms: 2,
-        built_area: 95,
-        main_image: '/images/placeholders/urban-penthouse.jpg',
-        images: ['/images/placeholders/urban-penthouse.jpg'],
-        location: 'Gorlero, Punta del Este',
-        lifestyle_tags: ['Urban', 'Inversión']
-      },
-    ];
-  }
-
+export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-background text-foreground">
+    <main className="flex flex-col min-h-screen bg-background text-foreground">
       {/* 1. HERO SECTION - Cinematic */}
-      <HeroSection />
+      <HeroSequence />
 
       {/* 2. LIFESTYLE CATEGORIES */}
       <LifestyleCategories />
 
       {/* 3. FEATURED PROPERTIES - Bento Grid */}
       <BentoGrid
-        properties={properties}
+        properties={FEATURED_PROPERTIES}
         title="Propiedades Destacadas"
         subtitle="Selección curada de propiedades exclusivas en Punta del Este"
       />
 
       {/* 4. MAP WITH LISTINGS - Interactive */}
       <MapWithListings
-        properties={properties}
+        properties={FEATURED_PROPERTIES}
         title="Explora en el Mapa"
         subtitle="Encuentra propiedades por ubicación en Punta del Este"
       />
@@ -202,6 +160,6 @@ export default async function Home() {
 
       {/* 6. FOOTER */}
       <Footer />
-    </div>
+    </main>
   );
 }

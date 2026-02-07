@@ -1,6 +1,7 @@
 
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { ActiveLink } from '@/components/luxe/ActiveLink'
 
 export function Header() {
     return (
@@ -10,15 +11,15 @@ export function Header() {
                     <span>PuntaRealEstate</span>
                 </Link>
                 <nav className="flex items-center gap-6 text-sm font-medium">
-                    <Link href="/search" className="transition-colors hover:text-primary">
+                    <ActiveLink href="/search">
                         Propiedades
-                    </Link>
-                    <Link href="/search" className="transition-colors hover:text-primary">
+                    </ActiveLink>
+                    <ActiveLink href="/map">
                         Mapa Interactivo
-                    </Link>
-                    <Link href="/partners" className="transition-colors hover:text-primary">
+                    </ActiveLink>
+                    <ActiveLink href="/partners">
                         Inmobiliarias
-                    </Link>
+                    </ActiveLink>
                 </nav>
                 <div className="flex items-center gap-4">
                     <Button variant="outline" size="sm">

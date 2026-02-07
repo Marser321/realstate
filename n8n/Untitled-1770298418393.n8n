@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-02-06T14:51:17.821Z",
+  "updatedAt": "2026-02-07T14:22:17.891Z",
   "createdAt": "2026-02-05T13:33:38.860Z",
   "id": "aPtLiVdqp99K90Ee",
   "name": "Untitled-1770298418393",
@@ -17,7 +17,7 @@
   "pinData": null,
   "versionId": "6ddea991-cadf-4e46-9642-e89fd2b129ee",
   "activeVersionId": null,
-  "versionCounter": 3,
+  "versionCounter": 4,
   "triggerCount": 0,
   "shared": [
     {
@@ -42,7 +42,7 @@
             "userId": "9ff14152-0992-4e9b-b7ee-cc36f53e7094",
             "projectId": "8Dv5vhrvFaLtie1u",
             "user": {
-              "updatedAt": "2026-02-06T14:51:17.000Z",
+              "updatedAt": "2026-02-07T14:22:17.000Z",
               "createdAt": "2026-02-05T11:11:33.089Z",
               "id": "9ff14152-0992-4e9b-b7ee-cc36f53e7094",
               "email": "moreraescobar@gmail.com",
@@ -59,7 +59,7 @@
               },
               "disabled": false,
               "mfaEnabled": false,
-              "lastActiveAt": "2026-02-06",
+              "lastActiveAt": "2026-02-07",
               "isPending": false
             }
           }

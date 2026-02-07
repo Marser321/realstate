@@ -100,14 +100,14 @@ export function BentoGrid({
                         <p className="text-muted-foreground text-lg">{subtitle}</p>
                     </div>
 
-                    <button className="group flex items-center gap-2 text-[#D4AF37] font-semibold hover:gap-3 transition-all">
+                    <button className="group flex items-center gap-2 text-[#D4AF37] font-semibold hover:gap-3 transition-all" data-magnetic="true">
                         Ver todas las propiedades
                         <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </button>
                 </motion.div>
 
                 {/* Grid Layout */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[minmax(300px,auto)]">
                     {showSkeleton ? (
                         // Skeleton loading state
                         Array.from({ length: 6 }).map((_, index) => (
@@ -115,14 +115,21 @@ export function BentoGrid({
                         ))
                     ) : (
                         // Property cards
-                        properties.map((property, index) => (
-                            <PropertyCard
-                                key={property.id}
-                                property={property}
-                                index={index}
-                                onHover={onPropertyHover}
-                            />
-                        ))
+                        properties.map((property, index) => {
+                            // Asymmetrical Layout Pattern
+                            // Items at index 0, 3, 6... span 2 columns on large screens
+                            const isLarge = index === 0 || index === 3 || index === 6;
+
+                            return (
+                                <PropertyCard
+                                    key={property.id}
+                                    property={property}
+                                    index={index}
+                                    onHover={onPropertyHover}
+                                    className={`${isLarge ? 'md:col-span-2 lg:col-span-2' : 'col-span-1'} h-full`}
+                                />
+                            );
+                        })
                     )}
                 </div>
             </div>

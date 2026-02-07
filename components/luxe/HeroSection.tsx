@@ -1,70 +1,119 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useTransform, MotionValue } from 'framer-motion';
 import { Search, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
+import { CanvasSequenceAnimator } from './CanvasSequenceAnimator';
 
 export function HeroSection() {
     const [searchQuery, setSearchQuery] = useState('');
 
     return (
-        <section className="relative h-screen min-h-[700px] overflow-hidden">
-            {/* Video Background with Poster Fallback */}
-            <div className="absolute inset-0 z-0">
-                <video
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    poster="/images/placeholders/luxury-villa.jpg"
-                    className="absolute inset-0 w-full h-full object-cover"
-                >
-                    {/* Video placeholder - replace with actual drone footage */}
-                    {/* <source src="/videos/drone-mansions.mp4" type="video/mp4" /> */}
-                </video>
+        <CanvasSequenceAnimator
+            frameCount={160}
+            frameUrlPattern="/sequences/mansion/frame_{index}.webp"
+            className="w-full relative bg-black"
+            captions={[
+                {
+                    at: 0.15,
+                    text: 'La Vista que Mereces',
+                    position: 'center',
+                },
+                {
+                    at: 0.35,
+                    text: 'Diseño Arquitectónico Único',
+                    position: 'bottom-left',
+                },
+                {
+                    at: 0.55,
+                    text: 'Piscina Infinity Edge',
+                    position: 'bottom-right',
+                },
+                {
+                    at: 0.75,
+                    text: 'Materiales de Primera',
+                    position: 'center',
+                },
+                {
+                    at: 0.90,
+                    text: 'Tu Próximo Hogar',
+                    position: 'center',
+                },
+            ]}
+        >
+            {(scrollProgress: MotionValue<number>) => (
+                <HeroContent
+                    scrollProgress={scrollProgress}
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                />
+            )}
+        </CanvasSequenceAnimator>
+    );
+}
 
-                {/* Dark Overlay 30% for better text contrast */}
-                <div className="absolute inset-0 bg-black/30" />
+// Separate component to handle the inner content logic and animations
+function HeroContent({
+    scrollProgress,
+    searchQuery,
+    setSearchQuery
+}: {
+    scrollProgress: MotionValue<number>;
+    searchQuery: string;
+    setSearchQuery: (q: string) => void;
+}) {
+    // Opacity animation: Fade out as user starts scrolling (0 to 0.1)
+    const contentOpacity = useTransform(scrollProgress, [0, 0.08], [1, 0]);
+    const navOpacity = useTransform(scrollProgress, [0, 0.1], [1, 0.8]); // Nav stays visible but dims slightly
+    const navY = useTransform(scrollProgress, [0, 0.1], [0, -20]); // Optional: Nav moves up slightly or stays? Let's keep it fixed or simple. Actually let's keep Nav visible always but maybe change transparent/blur.
 
-                {/* Gradient overlay for text readability */}
-                <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/70" />
-            </div>
+    // Let's make the main Hero text disappear quickly so the animation takes over
+    // But the Nav should stay accessible or maybe fade out if we want full immersion?
+    // User said "move it to the main hero". Usually Hero nav is useful.
+    // Let's keep Nav visible but maybe minimal.
+    // Actually, let's fade out the Hero TEXT, but keep the NAV.
 
-            {/* Header Navigation */}
-            <header className="absolute top-0 left-0 right-0 z-50">
+    // Transform for Hero Text: Move up and fade out
+    const textY = useTransform(scrollProgress, [0, 0.1], [0, -100]);
+
+    return (
+        <>
+            {/* Header Navigation - Stays visible (or maybe fades if desired) */}
+            <motion.header
+                className="absolute top-0 left-0 right-0 z-50 transition-all duration-300"
+                style={{ opacity: 1 }} // Keep nav visible for now, or use navOpacity if desired
+            >
                 <nav className="container mx-auto px-6 py-6 flex justify-between items-center">
                     <Link href="/" className="flex items-center group">
-                        <h1 className="text-2xl md:text-3xl font-serif font-bold text-white tracking-tight transition-transform group-hover:scale-105">
+                        <h1 className="text-2xl md:text-3xl font-serif font-bold text-white tracking-tight transition-transform group-hover:scale-105 drop-shadow-md">
                             Luxe<span className="text-[#D4AF37]">Estate</span>
                         </h1>
                     </Link>
 
                     <div className="hidden md:flex items-center gap-8">
-                        <Link href="/search" className="text-white/90 hover:text-[#D4AF37] transition-colors font-medium text-sm tracking-wide">
-                            Propiedades
-                        </Link>
-                        <Link href="/search" className="text-white/90 hover:text-[#D4AF37] transition-colors font-medium text-sm tracking-wide">
-                            Mapa
-                        </Link>
-                        <Link href="/partners" className="text-white/90 hover:text-[#D4AF37] transition-colors font-medium text-sm tracking-wide">
-                            Inmobiliarias
-                        </Link>
-                        <button className="btn-luxe px-6 py-2.5 rounded-full text-white font-bold text-sm tracking-wide shadow-lg hover:shadow-[#D4AF37]/20">
+                        {['Propiedades', 'Mapa', 'Inmobiliarias'].map((item) => (
+                            <Link
+                                key={item}
+                                href={`/${item.toLowerCase()}`}
+                                className="text-white/90 hover:text-[#D4AF37] transition-colors font-medium text-sm tracking-wide drop-shadow-sm"
+                            >
+                                {item}
+                            </Link>
+                        ))}
+                        <button className="btn-luxe px-6 py-2.5 rounded-full text-white font-bold text-sm tracking-wide shadow-lg hover:shadow-[#D4AF37]/20 border border-white/20 backdrop-blur-sm hover:bg-white/10 transition-all">
                             Publicar
                         </button>
                     </div>
                 </nav>
-            </header>
+            </motion.header>
 
-            {/* Hero Content */}
-            <div className="relative z-20 flex flex-col items-center justify-center h-full px-4 pt-20">
-                <motion.div
-                    initial={{ opacity: 0, y: 40 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                    className="text-center max-w-5xl"
-                >
+            {/* Initial Hero Content (Fades out on scroll) */}
+            <motion.div
+                className="relative z-20 flex flex-col items-center justify-center h-full px-4 pt-20"
+                style={{ opacity: contentOpacity, y: textY }}
+            >
+                <div className="text-center max-w-5xl">
                     {/* Tagline */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -72,7 +121,7 @@ export function HeroSection() {
                         transition={{ delay: 0.2, duration: 0.6 }}
                         className="flex items-center justify-center gap-2 mb-8"
                     >
-                        <div className="px-4 py-1.5 rounded-full border border-[#D4AF37]/30 bg-black/20 backdrop-blur-md flex items-center gap-2">
+                        <div className="px-4 py-1.5 rounded-full border border-[#D4AF37]/30 bg-black/40 backdrop-blur-md flex items-center gap-2 shadow-lg">
                             <Sparkles className="w-4 h-4 text-[#D4AF37]" />
                             <span className="text-[#D4AF37] font-semibold tracking-widest uppercase text-xs">
                                 Real Estate de Lujo
@@ -94,11 +143,11 @@ export function HeroSection() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4, duration: 0.6 }}
-                        className="text-xl md:text-3xl text-white/90 font-light mb-16 max-w-3xl mx-auto leading-relaxed"
+                        className="text-xl md:text-3xl text-white/90 font-light mb-16 max-w-3xl mx-auto leading-relaxed drop-shadow-md"
                     >
                         La colección más exclusiva de propiedades en Punta del Este, La Barra y José Ignacio.
                     </motion.p>
-                </motion.div>
+                </div>
 
                 {/* AI Search Bar */}
                 <motion.div
@@ -107,18 +156,18 @@ export function HeroSection() {
                     transition={{ delay: 0.6, duration: 0.8 }}
                     className="w-full max-w-2xl"
                 >
-                    <div className="glass-card rounded-full p-2 flex items-center shadow-2xl">
+                    <div className="glass-card rounded-full p-2 flex items-center shadow-2xl bg-white/10 backdrop-blur-xl border border-white/20">
                         <div className="flex items-center flex-1 pl-4">
                             <Search className="w-5 h-5 text-[#D4AF37] mr-3" />
                             <input
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="¿Buscas un ático con vista al mar y espacio para oficina?"
-                                className="flex-1 bg-transparent border-none focus:ring-0 focus:outline-none text-foreground placeholder:text-muted-foreground text-lg py-3"
+                                placeholder="¿Buscas un ático con vista al mar?"
+                                className="flex-1 bg-transparent border-none focus:ring-0 focus:outline-none text-white placeholder:text-white/60 text-lg py-3"
                             />
                         </div>
-                        <button className="btn-luxe px-8 py-3 rounded-full text-white font-semibold text-lg">
+                        <button className="btn-luxe px-8 py-3 rounded-full text-white font-semibold text-lg hover:scale-105 transition-transform">
                             Buscar
                         </button>
                     </div>
@@ -132,34 +181,15 @@ export function HeroSection() {
                     className="flex flex-wrap justify-center gap-3 mt-8"
                 >
                     {['Vista al Mar', 'Golf & Country', 'Sunset Views', 'Chacras Privadas', 'Frente al Lago'].map((tag, i) => (
-                        <motion.button
+                        <button
                             key={tag}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 1 + i * 0.1 }}
-                            className="px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-sm text-white/90 font-medium hover:bg-white/20 hover:border-[#D4AF37]/50 transition-all cursor-pointer"
+                            className="px-4 py-2 bg-black/40 backdrop-blur-md border border-white/20 rounded-full text-sm text-white/90 font-medium hover:bg-white/20 hover:border-[#D4AF37]/50 transition-all cursor-pointer shadow-lg"
                         >
                             {tag}
-                        </motion.button>
+                        </button>
                     ))}
                 </motion.div>
-            </div>
-
-            {/* Scroll Indicator */}
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.5, duration: 0.6 }}
-                className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20"
-            >
-                <motion.div
-                    animate={{ y: [0, 8, 0] }}
-                    transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-                    className="w-6 h-10 border-2 border-white/50 rounded-full flex items-start justify-center p-2"
-                >
-                    <div className="w-1.5 h-3 bg-[#D4AF37] rounded-full" />
-                </motion.div>
             </motion.div>
-        </section>
+        </>
     );
 }

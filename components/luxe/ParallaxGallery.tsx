@@ -16,9 +16,10 @@ interface ParallaxGalleryProps {
     title: string;
     location: string;
     badge?: string;
+    id?: number | string;
 }
 
-export function ParallaxGallery({ images, title, location, badge }: ParallaxGalleryProps) {
+export function ParallaxGallery({ images, title, location, badge, id }: ParallaxGalleryProps) {
     const containerRef = useRef<HTMLDivElement>(null);
 
     const { scrollYProgress } = useScroll({
@@ -32,7 +33,6 @@ export function ParallaxGallery({ images, title, location, badge }: ParallaxGall
     // Hero image parallax (slower movement)
     const heroY = useTransform(smoothProgress, [0, 1], ['0%', '30%']);
     const heroScale = useTransform(smoothProgress, [0, 0.5], [1, 1.1]);
-    const heroOpacity = useTransform(smoothProgress, [0, 0.8], [1, 0.3]);
 
     // Text parallax (faster movement)
     const textY = useTransform(smoothProgress, [0, 1], ['0%', '100%']);
@@ -51,6 +51,7 @@ export function ParallaxGallery({ images, title, location, badge }: ParallaxGall
                 <motion.div
                     style={{ y: heroY, scale: heroScale }}
                     className="absolute inset-0 w-full h-[120%] -top-[10%]"
+                    layoutId={id ? `property-image-${id}` : undefined}
                 >
                     <img
                         src={mainImage.src}
