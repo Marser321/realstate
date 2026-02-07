@@ -23,7 +23,7 @@ interface Property {
     title: string;
     slug?: string;
     price: number;
-    currency: string;
+    currency: string | null;
     bedrooms: number;
     bathrooms: number;
     built_area: number;
@@ -83,8 +83,8 @@ export function MapWithListings({
                         <button
                             onClick={() => setViewMode('split')}
                             className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${viewMode === 'split'
-                                    ? 'bg-white shadow-sm text-foreground'
-                                    : 'text-muted-foreground hover:text-foreground'
+                                ? 'bg-white shadow-sm text-foreground'
+                                : 'text-muted-foreground hover:text-foreground'
                                 }`}
                         >
                             <Grid3X3 className="w-4 h-4" />
@@ -93,8 +93,8 @@ export function MapWithListings({
                         <button
                             onClick={() => setViewMode('map')}
                             className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${viewMode === 'map'
-                                    ? 'bg-white shadow-sm text-foreground'
-                                    : 'text-muted-foreground hover:text-foreground'
+                                ? 'bg-white shadow-sm text-foreground'
+                                : 'text-muted-foreground hover:text-foreground'
                                 }`}
                         >
                             <MapIcon className="w-4 h-4" />
@@ -103,8 +103,8 @@ export function MapWithListings({
                         <button
                             onClick={() => setViewMode('list')}
                             className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${viewMode === 'list'
-                                    ? 'bg-white shadow-sm text-foreground'
-                                    : 'text-muted-foreground hover:text-foreground'
+                                ? 'bg-white shadow-sm text-foreground'
+                                : 'text-muted-foreground hover:text-foreground'
                                 }`}
                         >
                             <List className="w-4 h-4" />
@@ -120,8 +120,8 @@ export function MapWithListings({
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: 0.2 }}
                     className={`grid gap-6 ${viewMode === 'split'
-                            ? 'lg:grid-cols-2'
-                            : 'grid-cols-1'
+                        ? 'lg:grid-cols-2'
+                        : 'grid-cols-1'
                         }`}
                 >
                     {/* Map */}
@@ -140,8 +140,8 @@ export function MapWithListings({
                     {/* Property List */}
                     {viewMode !== 'map' && (
                         <div className={`space-y-4 ${viewMode === 'split'
-                                ? 'max-h-[600px] overflow-y-auto pr-2 scrollbar-hide'
-                                : ''
+                            ? 'max-h-[600px] overflow-y-auto pr-2 scrollbar-hide'
+                            : ''
                             }`}>
                             {properties.map((property, index) => (
                                 <motion.div
@@ -153,8 +153,8 @@ export function MapWithListings({
                                     onMouseEnter={() => handlePropertyHover(property.id)}
                                     onMouseLeave={() => handlePropertyHover(null)}
                                     className={`transition-all duration-300 ${hoveredPropertyId === property.id
-                                            ? 'ring-2 ring-[#D4AF37] rounded-2xl'
-                                            : ''
+                                        ? 'ring-2 ring-[#D4AF37] rounded-2xl'
+                                        : ''
                                         }`}
                                 >
                                     <PropertyCard property={property} index={0} />

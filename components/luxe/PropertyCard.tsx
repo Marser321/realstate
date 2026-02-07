@@ -12,7 +12,7 @@ interface Property {
     title: string;
     slug?: string;
     price: number;
-    currency: string;
+    currency: string | null;
     bedrooms: number;
     bathrooms: number;
     built_area: number;
@@ -92,7 +92,7 @@ export function PropertyCard({ property, onHover, index = 0, className = '' }: P
         }
     };
 
-    const formatPrice = (price: number, currency: string) => {
+    const formatPrice = (price: number, currency: string | null | undefined) => {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: currency || 'USD',

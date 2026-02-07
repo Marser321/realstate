@@ -45,7 +45,7 @@ interface Property {
     id: number | string;
     title: string;
     price: number;
-    currency: string;
+    currency: string | null;
     lat?: number;
     lng?: number;
     location?: string;
@@ -103,11 +103,11 @@ export default function LuxeMap({
         }));
     }, [properties]);
 
-    const formatPrice = (price: number, currency: string) => {
+    const formatPrice = (price: number, currency: string | null) => {
         if (price >= 1000000) {
-            return `$${(price / 1000000).toFixed(1)}M`;
+            return `${currency === 'USD' ? 'USD' : '$'} ${(price / 1000000).toFixed(1)}M`;
         }
-        return `$${(price / 1000).toFixed(0)}k`;
+        return `${currency === 'USD' ? 'USD' : '$'} ${(price / 1000).toFixed(0)}k`;
     };
 
     return (
