@@ -47,9 +47,8 @@ export async function POST(request: Request) {
                 name: agencyName,
                 slug: agencySlug,
                 description: description,
-                // city: city, // Check if city column exists or if it's metadata
-                status: 'active',
-                tier_subscription: 'free' // Default tier
+                city: city || null,
+                tier_subscription: 'basic' // Valid values: 'basic' | 'pro' | 'enterprise'
             })
             .select()
             .single()
