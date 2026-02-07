@@ -12,15 +12,17 @@ interface Property {
     title: string;
     slug?: string;
     price: number;
-    currency: string | null;
+    currency: string | null; // Allow null
     bedrooms: number;
     bathrooms: number;
-    built_area: number | null;
-    main_image: string | null;
-    images?: string[];
+    built_area: number | null; // Allow null
+    main_image: string | null; // Allow null
+    images?: string[] | null; // Allow null
     location?: string;
+    location_name?: string; // Add support for location_name from search results
     status?: string;
     lifestyle_tags?: string[] | null;
+    is_featured?: boolean; // Add support for is_featured
 }
 
 interface PropertyCardProps {
@@ -53,7 +55,15 @@ export function PropertyCard({ property, onHover, index = 0, className = '' }: P
     const { isFavorite, toggleFavorite } = useFavorites();
     const isPropertyFavorite = isFavorite(property.id);
 
-    const images = property.images?.length ? property.images : [property.main_image || BLUR_PLACEHOLDER];
+    // Handle images safely
+    const images = property.images?.length
+        ? property.images
+        : property.main_image
+            ? [property.main_image]
+            : [BLUR_PLACEHOLDER];
+
+    // Handle location fallback
+    const locationDisplay = property.location || property.location_name || 'Punta del Este';
 
     const handleMouseMove = ({ currentTarget, clientX, clientY }: MouseEvent) => {
         const { left, top, width, height } = currentTarget.getBoundingClientRect();
@@ -231,7 +241,7 @@ export function PropertyCard({ property, onHover, index = 0, className = '' }: P
                                 </h3>
                                 <div className="flex items-center text-muted-foreground text-sm mt-1">
                                     <MapPin className="w-3.5 h-3.5 mr-1" />
-                                    <span>{property.location || 'Punta del Este'}</span>
+                                    <span>{locationDisplay}</span>
                                 </div>
                             </div>
                             <div className="text-right">

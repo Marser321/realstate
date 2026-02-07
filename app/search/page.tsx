@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import SearchContent from './SearchContent'
-import { PropertyCardSkeleton } from '@/components/property/PropertyCardSkeleton'
+import { PropertyCardSkeleton } from '@/components/luxe/PropertyCardSkeleton'
 
 // Force dynamic for search with filters
 export const dynamic = 'force-dynamic'

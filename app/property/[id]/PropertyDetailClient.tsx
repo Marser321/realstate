@@ -8,7 +8,7 @@ import { Bed, Bath, Home, Share, Heart, Phone, MessageCircle } from "lucide-reac
 import { motion } from "framer-motion";
 import { ParallaxGallery } from "@/components/luxe/ParallaxGallery";
 import { ScrollRevealSection, StickySidebar, FeatureReveal, TextReveal } from "@/components/luxe/ScrollAnimations";
-import { InvestmentPotential } from "@/components/property/InvestmentPotential";
+import { InvestmentPotential } from "@/components/luxe/InvestmentPotential";
 import Link from "next/link";
 import Image from "next/image";
 
