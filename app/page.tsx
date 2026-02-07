@@ -17,8 +17,8 @@ const FEATURED_PROPERTIES = [
     bathrooms: 4,
     built_area: 450,
     location: "La Barra",
-    images: ["/images/prop1.jpg", "/images/prop1b.jpg"],
-    main_image: "/images/prop1.jpg",
+    images: ["/images/placeholders/luxury-villa.jpg", "/images/placeholders/interior-view.jpg"],
+    main_image: "/images/placeholders/luxury-villa.jpg",
     status: "en_venta",
     lifestyle_tags: ["Frente al Mar", "Diseño"]
   },
@@ -31,7 +31,7 @@ const FEATURED_PROPERTIES = [
     bathrooms: 3,
     built_area: 280,
     location: "Punta del Este",
-    main_image: "/images/prop2.jpg",
+    main_image: "/images/placeholders/urban-penthouse.jpg",
     status: "en_venta",
     lifestyle_tags: ["Vistas", "Lujo"]
   },
@@ -44,7 +44,7 @@ const FEATURED_PROPERTIES = [
     bathrooms: 5,
     built_area: 600,
     location: "José Ignacio",
-    main_image: "/images/prop3.jpg",
+    main_image: "/images/placeholders/farm-ranch.jpg",
     status: "en_venta",
     lifestyle_tags: ["Naturaleza", "Privacidad"]
   },
@@ -57,7 +57,7 @@ const FEATURED_PROPERTIES = [
     bathrooms: 4,
     built_area: 350,
     location: "Manantiales",
-    main_image: "/images/prop4.jpg",
+    main_image: "/images/placeholders/beach-house.jpg",
     status: "en_venta",
     lifestyle_tags: ["Playa", "Surf"]
   },
@@ -70,7 +70,7 @@ const FEATURED_PROPERTIES = [
     bathrooms: 5,
     built_area: 400,
     location: "Golf",
-    main_image: "/images/prop5.jpg",
+    main_image: "/images/placeholders/golf-estate.jpg",
     status: "en_venta",
     lifestyle_tags: ["Golf", "Seguridad"]
   },
@@ -83,7 +83,7 @@ const FEATURED_PROPERTIES = [
     bathrooms: 2,
     built_area: 120,
     location: "Peninsula",
-    main_image: "/images/prop6.jpg",
+    main_image: "/images/placeholders/modern-apartment.jpg",
     status: "en_venta",
     lifestyle_tags: ["Céntrico", "Inversión"]
   }
