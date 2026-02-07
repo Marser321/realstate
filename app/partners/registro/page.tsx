@@ -4,6 +4,8 @@ import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Building2, User, Upload, Check, ArrowRight, ArrowLeft } from 'lucide-react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/hooks/useAuth'
 
 // Step indicator component
 function StepIndicator({ currentStep }: { currentStep: number }) {
@@ -128,6 +130,8 @@ interface AdminData {
 }
 
 export default function RegistroPage() {
+    const router = useRouter()
+    const { user, loading: authLoading } = useAuth()
     const [step, setStep] = useState(1)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [agencyData, setAgencyData] = useState<AgencyData>({
@@ -144,6 +148,9 @@ export default function RegistroPage() {
         fullName: '',
     })
 
+    // Determine if we are in "Complete Profile" mode (logged in but no agency)
+    const isCompleteProfileMode = !!user;
+
     // Auto-generate slug from name
     const handleNameChange = (name: string) => {
         const slug = name
@@ -155,7 +162,12 @@ export default function RegistroPage() {
 
     const handleNext = () => {
         if (step === 1 && agencyData.name && agencyData.city) {
-            setStep(2)
+            // If in complete profile mode, we submit directly from step 1
+            if (isCompleteProfileMode) {
+                handleSubmit(new Event('submit') as any)
+            } else {
+                setStep(2)
+            }
         }
     }
 
@@ -165,7 +177,8 @@ export default function RegistroPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (adminData.password !== adminData.confirmPassword) {
+
+        if (!isCompleteProfileMode && adminData.password !== adminData.confirmPassword) {
             alert('Las contraseñas no coinciden')
             return
         }
@@ -173,31 +186,57 @@ export default function RegistroPage() {
         setIsSubmitting(true)
 
         try {
-            const response = await fetch('/api/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    agencyName: agencyData.name,
-                    agencySlug: agencyData.slug,
-                    city: agencyData.city,
-                    description: agencyData.description,
-                    adminEmail: adminData.email,
-                    adminPassword: adminData.password,
-                    adminName: adminData.fullName,
-                }),
-            })
+            let response;
+
+            if (isCompleteProfileMode) {
+                // Mode: Create Agency for Existing User
+                // First upload logo if present (simulated or real)
+                let logoUrl = null;
+                // TODO: Implement actual logo upload to storage if needed
+
+                response = await fetch('/api/partners/create-agency', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        agencyName: agencyData.name,
+                        agencySlug: agencyData.slug,
+                        city: agencyData.city,
+                        description: agencyData.description,
+                        logoUrl: logoUrl
+                    }),
+                })
+            } else {
+                // Mode: Full Registration (User + Agency)
+                response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        agencyName: agencyData.name,
+                        agencySlug: agencyData.slug,
+                        city: agencyData.city,
+                        description: agencyData.description,
+                        adminEmail: adminData.email,
+                        adminPassword: adminData.password,
+                        adminName: adminData.fullName,
+                    }),
+                })
+            }
 
             const data = await response.json()
 
             if (!response.ok) {
-                throw new Error(data.error || 'Error al registrar')
+                throw new Error(data.error || 'Error al procesar solicitud')
             }
 
-            // Success! Redirect to login
-            // We can add a query param to show a success message on login page if implemented
-            window.location.href = '/partners/login?registered=true'
+            // Success! 
+            if (isCompleteProfileMode) {
+                // If we were already logged in, go straight to dashboard
+                // Force a reload or re-fetch of agency data
+                window.location.href = '/partners/dashboard?created=true'
+            } else {
+                // If new registration, go to login
+                window.location.href = '/partners/login?registered=true'
+            }
 
         } catch (error: any) {
             console.error('Registration error:', error)
@@ -205,6 +244,14 @@ export default function RegistroPage() {
         } finally {
             setIsSubmitting(false)
         }
+    }
+
+    if (authLoading) {
+        return (
+            <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
+            </div>
+        )
     }
 
     return (
@@ -218,14 +265,21 @@ export default function RegistroPage() {
                 <div className="glass-card rounded-2xl p-8 shadow-2xl">
                     <div className="text-center mb-8">
                         <h1 className="text-3xl font-serif font-bold text-foreground mb-2">
-                            Únete a <span className="text-gold">Luxe Estate</span>
+                            {isCompleteProfileMode ? (
+                                <>Completa tu <span className="text-gold">Perfil de Agencia</span></>
+                            ) : (
+                                <>Únete a <span className="text-gold">Luxe Estate</span></>
+                            )}
                         </h1>
                         <p className="text-muted-foreground">
-                            Registra tu inmobiliaria y comienza a publicar propiedades
+                            {isCompleteProfileMode
+                                ? 'Solo un paso más para publicar tus propiedades'
+                                : 'Registra tu inmobiliaria y comienza a publicar propiedades'
+                            }
                         </p>
                     </div>
 
-                    <StepIndicator currentStep={step} />
+                    {!isCompleteProfileMode && <StepIndicator currentStep={step} />}
 
                     <form onSubmit={handleSubmit}>
                         <AnimatePresence mode="wait">
@@ -300,16 +354,19 @@ export default function RegistroPage() {
                                     <button
                                         type="button"
                                         onClick={handleNext}
-                                        disabled={!agencyData.name || !agencyData.city}
+                                        disabled={!agencyData.name || !agencyData.city || isSubmitting}
                                         className="w-full btn-luxe py-3 px-6 rounded-xl text-white font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        Continuar
-                                        <ArrowRight className="w-4 h-4" />
+                                        {isCompleteProfileMode ? (
+                                            isSubmitting ? 'Creando Agencia...' : 'Finalizar y Crear Agencia'
+                                        ) : (
+                                            <>Continuar <ArrowRight className="w-4 h-4" /></>
+                                        )}
                                     </button>
                                 </motion.div>
                             )}
 
-                            {step === 2 && (
+                            {step === 2 && !isCompleteProfileMode && (
                                 <motion.div
                                     key="step2"
                                     initial={{ opacity: 0, x: 20 }}
@@ -414,12 +471,14 @@ export default function RegistroPage() {
                         </AnimatePresence>
                     </form>
 
-                    <p className="mt-6 text-center text-sm text-muted-foreground">
-                        ¿Ya tienes cuenta?{' '}
-                        <a href="/partners/login" className="text-gold hover:underline">
-                            Inicia sesión
-                        </a>
-                    </p>
+                    {!isCompleteProfileMode && (
+                        <p className="mt-6 text-center text-sm text-muted-foreground">
+                            ¿Ya tienes cuenta?{' '}
+                            <a href="/partners/login" className="text-gold hover:underline">
+                                Inicia sesión
+                            </a>
+                        </p>
+                    )}
                 </div>
             </motion.div>
         </div>

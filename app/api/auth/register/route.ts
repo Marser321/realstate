@@ -65,7 +65,28 @@ export async function POST(request: Request) {
 
         const agencyId = agencyData.id
 
-        // 3. Link User to Agency (Create agency_user)
+        // 3. Create Public Profile
+        const { error: profileError } = await supabaseAdmin
+            .from('profiles')
+            .insert({
+                id: userId,
+                full_name: adminName,
+                role: 'agent', // Default role for agency self-registration
+                created_at: new Date().toISOString()
+            })
+
+        if (profileError) {
+            console.error('Profile creation error:', profileError)
+            // Non-critical (?) but highly recommended. We could return error or just log.
+            // Let's create the profile, if it fails, the user exists in Auth but not in public schema.
+            // This causes the "empty dashboard" bug. So we should treat it as error.
+            return NextResponse.json(
+                { error: 'Failed to create agent profile' },
+                { status: 400 }
+            )
+        }
+
+        // 4. Link User to Agency (Create agency_user)
         const { error: linkError } = await supabaseAdmin
             .from('agency_users')
             .insert({

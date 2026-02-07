@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { SearchDialog } from '@/components/search/SearchDialog';
 import { SmoothScroll } from '@/components/luxe/SmoothScroll';
 import { CustomCursor } from '@/components/luxe/CustomCursor';
+import { Toaster } from '@/components/ui/sonner';
 
 const fontSans = Inter({
   subsets: ['latin'],
@@ -74,6 +75,7 @@ export default function RootLayout({
         <SmoothScroll />
         <CustomCursor />
         <SearchDialog />
+        <Toaster />
         {children}
       </body>
     </html>
