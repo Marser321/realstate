@@ -1,23 +1,12 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { Database } from '@/types/supabase' // Assuming types exist, otherwise ignore or use any
+
 
 export async function POST(request: Request) {
     try {
         // 1. Authenticate the user
-        const cookieStore = cookies()
-        const supabase = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-            {
-                cookies: {
-                    get(name: string) {
-                        return cookieStore.get(name)?.value
-                    },
-                },
-            }
-        )
+        const supabase = await createClient()
 
         const { data: { user }, error: authError } = await supabase.auth.getUser()
 
@@ -76,7 +65,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: agencyError.message }, { status: 400 })
         }
 
-        const agencyId = agencyData.id
+        const agencyId = agencyData.id as number
 
         // B. Insert Agency User (Link)
         const { error: linkError } = await supabase

@@ -41,8 +41,9 @@ export default function SearchPage() {
     })
 
     // Handlers
-    const handlePropertyHover = useCallback((id: number | null) => {
-        highlightProperty(id)
+    const handlePropertyHover = useCallback((id: number | string | null) => {
+        const numId = typeof id === 'string' ? Number(id) : id
+        highlightProperty(numId || null) // Handle NaN or 0 if needed, but primarily cast valid number strings
     }, [highlightProperty])
 
     return (
@@ -207,9 +208,7 @@ export default function SearchPage() {
                                     <PropertyCard
                                         key={property.id}
                                         property={property}
-                                        isHighlighted={highlightedPropertyId === property.id}
-                                        onMouseEnter={() => handlePropertyHover(property.id)}
-                                        onMouseLeave={() => handlePropertyHover(null)}
+                                        onHover={(id) => handlePropertyHover(typeof id === 'string' ? parseInt(id) : id)}
                                     />
                                 ))
                             ) : (

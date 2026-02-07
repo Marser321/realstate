@@ -9,6 +9,72 @@ export type Json =
 export interface Database {
     public: {
         Tables: {
+            profiles: {
+                Row: {
+                    id: string
+                    full_name: string | null
+                    role: 'admin' | 'agent' | 'user'
+                    avatar_url: string | null
+                    phone: string | null
+                    whatsapp: string | null
+                    bio: string | null
+                    license_number: string | null
+                    created_at: string
+                }
+                Insert: {
+                    id: string
+                    full_name?: string | null
+                    role?: 'admin' | 'agent' | 'user'
+                    avatar_url?: string | null
+                    phone?: string | null
+                    whatsapp?: string | null
+                    bio?: string | null
+                    license_number?: string | null
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    full_name?: string | null
+                    role?: 'admin' | 'agent' | 'user'
+                    avatar_url?: string | null
+                    phone?: string | null
+                    whatsapp?: string | null
+                    bio?: string | null
+                    license_number?: string | null
+                    created_at?: string
+                }
+                Relationships: []
+            }
+            locations: {
+                Row: {
+                    id: number
+                    slug: string
+                    name: string
+                    type: 'city' | 'zone' | 'neighborhood' | 'beach' | null
+                    parent_id: number | null
+                    coordinates: unknown | null
+                    created_at: string
+                }
+                Insert: {
+                    id?: number
+                    slug: string
+                    name: string
+                    type?: 'city' | 'zone' | 'neighborhood' | 'beach' | null
+                    parent_id?: number | null
+                    coordinates?: unknown | null
+                    created_at?: string
+                }
+                Update: {
+                    id?: number
+                    slug?: string
+                    name?: string
+                    type?: 'city' | 'zone' | 'neighborhood' | 'beach' | null
+                    parent_id?: number | null
+                    coordinates?: unknown | null
+                    created_at?: string
+                }
+                Relationships: []
+            }
             prospect_properties: {
                 Row: {
                     id: string
@@ -158,6 +224,43 @@ export interface Database {
                 }
                 Relationships: []
             }
+            agency_users: {
+                Row: {
+                    id: number
+                    agency_id: number
+                    user_id: string
+                    role: 'owner' | 'admin' | 'member'
+                    created_at: string
+                }
+                Insert: {
+                    id?: number
+                    agency_id: number
+                    user_id: string
+                    role?: 'owner' | 'admin' | 'member'
+                    created_at?: string
+                }
+                Update: {
+                    id?: number
+                    agency_id?: number
+                    user_id?: string
+                    role?: 'owner' | 'admin' | 'member'
+                    created_at?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "agency_users_agency_id_fkey"
+                        columns: ["agency_id"]
+                        referencedRelation: "agencies"
+                        referencedColumns: ["id"]
+                    },
+                    {
+                        foreignKeyName: "agency_users_user_id_fkey"
+                        columns: ["user_id"]
+                        referencedRelation: "users"
+                        referencedColumns: ["id"]
+                    }
+                ]
+            }
             properties: {
                 Row: {
                     id: string | number
@@ -173,6 +276,10 @@ export interface Database {
                     bathrooms: number
                     view_count: number
                     main_image: string | null
+                    built_area: number | null
+                    plot_area: number | null
+                    features: Json | null
+                    lifestyle_tags: string[] | null
                     [key: string]: any
                 }
                 Insert: {
@@ -231,3 +338,23 @@ export interface Database {
         }
     }
 }
+
+// Helper types for easier use
+export type Agency = Database['public']['Tables']['agencies']['Row']
+export type AgencyInsert = Database['public']['Tables']['agencies']['Insert']
+export type AgencyUpdate = Database['public']['Tables']['agencies']['Update']
+
+export type AgencyUser = Database['public']['Tables']['agency_users']['Row']
+export type AgencyUserInsert = Database['public']['Tables']['agency_users']['Insert']
+
+export type Property = Database['public']['Tables']['properties']['Row']
+export type PropertyInsert = Database['public']['Tables']['properties']['Insert']
+export type PropertyUpdate = Database['public']['Tables']['properties']['Update']
+
+export type Profile = Database['public']['Tables']['profiles']['Row']
+export type ProfileInsert = Database['public']['Tables']['profiles']['Insert']
+
+export type Location = Database['public']['Tables']['locations']['Row']
+
+export type ProspectProperty = Database['public']['Tables']['prospect_properties']['Row']
+export type OutreachQueue = Database['public']['Tables']['outreach_queue']['Row']

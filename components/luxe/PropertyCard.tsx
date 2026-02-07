@@ -15,12 +15,12 @@ interface Property {
     currency: string | null;
     bedrooms: number;
     bathrooms: number;
-    built_area: number;
-    main_image: string;
+    built_area: number | null;
+    main_image: string | null;
     images?: string[];
     location?: string;
     status?: string;
-    lifestyle_tags?: string[];
+    lifestyle_tags?: string[] | null;
 }
 
 interface PropertyCardProps {
@@ -53,7 +53,7 @@ export function PropertyCard({ property, onHover, index = 0, className = '' }: P
     const { isFavorite, toggleFavorite } = useFavorites();
     const isPropertyFavorite = isFavorite(property.id);
 
-    const images = property.images?.length ? property.images : [property.main_image];
+    const images = property.images?.length ? property.images : [property.main_image || BLUR_PLACEHOLDER];
 
     const handleMouseMove = ({ currentTarget, clientX, clientY }: MouseEvent) => {
         const { left, top, width, height } = currentTarget.getBoundingClientRect();
@@ -252,10 +252,12 @@ export function PropertyCard({ property, onHover, index = 0, className = '' }: P
                                 <Bath className="w-4 h-4 text-[#D4AF37]/70" />
                                 {property.bathrooms} Baños
                             </span>
-                            <span className="flex items-center gap-1.5">
-                                <Maximize2 className="w-4 h-4 text-[#D4AF37]/70" />
-                                {property.built_area} m²
-                            </span>
+                            {property.built_area && (
+                                <span className="flex items-center gap-1.5">
+                                    <Maximize2 className="w-4 h-4 text-[#D4AF37]/70" />
+                                    {property.built_area} m²
+                                </span>
+                            )}
                         </div>
                     </div>
                 </motion.article>

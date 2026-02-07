@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { supabase } from "@/lib/supabase"
-import { Property } from "@/types/supabase"
+import { Property } from "@/types/database.types"
 import { SearchFilters } from "./useSearchFilters"
 
 export type MapBounds = {
@@ -336,7 +336,7 @@ export function usePropertySearch({ filters, bounds, limit = 50 }: UsePropertySe
                 }
                 if (filters.lifestyles.length > 0) {
                     filtered = filtered.filter(p =>
-                        p.lifestyle_tags?.some(tag => filters.lifestyles.includes(tag))
+                        p.lifestyle_tags?.some((tag: string) => filters.lifestyles.includes(tag))
                     )
                 }
                 if (filters.features.length > 0) {

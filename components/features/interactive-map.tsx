@@ -23,7 +23,7 @@ interface InteractiveMapProps {
     properties?: PropertyWithLocation[]
     highlightedPropertyId?: number | null
     onBoundsChange?: (bounds: MapBounds) => void
-    onPropertyHover?: (id: number | null) => void
+    onPropertyHover?: (id: number | string | null) => void
     isSearchAsMove?: boolean
     className?: string
 }

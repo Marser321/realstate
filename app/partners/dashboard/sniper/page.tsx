@@ -13,7 +13,7 @@ import {
 import { ProspectsTable, ProspectRow } from '@/components/partners/ProspectsTable'
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/client'
-import { ProspectProperty } from '@/types/supabase'
+import { ProspectProperty } from '@/types/database.types'
 
 // Stat Card Component
 function StatCard({
