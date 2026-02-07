@@ -5,19 +5,20 @@ import { motion } from 'framer-motion'
 import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react'
 import { getSupabaseBrowserClient } from '@/lib/supabase-browser'
 import { useSearchParams } from 'next/navigation'
+import { toast } from 'sonner'
 
 export default function LoginPage() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState<string | null>(null)
+
     const searchParams = useSearchParams()
     const redirectTo = searchParams.get('redirect') || '/partners/dashboard'
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setError(null)
+
         setIsLoading(true)
 
         try {
@@ -28,7 +29,7 @@ export default function LoginPage() {
             })
 
             if (error) {
-                setError(error.message === 'Invalid login credentials'
+                toast.error(error.message === 'Invalid login credentials'
                     ? 'Email o contraseña incorrectos'
                     : error.message)
                 return
@@ -37,7 +38,7 @@ export default function LoginPage() {
             // Redirect to dashboard or intended page
             window.location.href = redirectTo
         } catch {
-            setError('Error al iniciar sesión. Intenta de nuevo.')
+            toast.error('Error al iniciar sesión. Intenta de nuevo.')
         } finally {
             setIsLoading(false)
         }
@@ -60,15 +61,7 @@ export default function LoginPage() {
                         </p>
                     </div>
 
-                    {error && (
-                        <motion.div
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm"
-                        >
-                            {error}
-                        </motion.div>
-                    )}
+
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {/* Email */}

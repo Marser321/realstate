@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Building2, User, Upload, Check, ArrowRight, ArrowLeft } from 'lucide-react'
 import Image from 'next/image'
+import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 
