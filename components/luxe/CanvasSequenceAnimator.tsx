@@ -179,17 +179,22 @@ export function CanvasSequenceAnimator({
         >
             {/* Sticky Canvas Container */}
             <div className="sticky top-0 h-screen w-full overflow-hidden">
-                {/* Loading State */}
+                {/* Loading State & Fallback */}
                 {isLoading && (
                     <div className="absolute inset-0 bg-slate-950 flex flex-col items-center justify-center z-20">
-                        <div className="w-64 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        {/* Fallback Image while loading or if fails */}
+                        <div
+                            className="absolute inset-0 bg-cover bg-center opacity-50"
+                            style={{ backgroundImage: 'url(/sequences/mansion/frame_0001.webp)' }}
+                        />
+                        <div className="relative z-10 w-64 h-1.5 bg-white/10 rounded-full overflow-hidden">
                             <motion.div
                                 className="h-full bg-gradient-to-r from-[#D4AF37] via-[#F4E4BC] to-[#D4AF37]"
                                 style={{ width: `${loadProgress}%` }}
                                 transition={{ duration: 0.1 }}
                             />
                         </div>
-                        <span className="mt-6 text-white/60 text-sm font-light tracking-wide">
+                        <span className="relative z-10 mt-6 text-white/60 text-sm font-light tracking-wide">
                             Cargando experiencia inmersiva... {Math.round(loadProgress)}%
                         </span>
                     </div>

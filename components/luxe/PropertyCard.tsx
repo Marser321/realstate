@@ -106,11 +106,11 @@ export function PropertyCard({ property, onHover, index = 0, className = '' }: P
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1, duration: 0.5 }}
-            className={`perspective-1000 ${className}`}
+            className={`h-full ${className}`}
         >
-            <Link href={`/property/${property.id}`}>
+            <Link href={`/property/${property.id}`} className="block h-full group perspective-1000">
                 <motion.article
-                    className="property-card group relative bg-card rounded-2xl overflow-hidden border border-border/50 transition-all duration-500"
+                    className="property-card relative bg-card rounded-2xl overflow-hidden border border-border/50 transition-all duration-500 h-full"
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                     onMouseMove={handleMouseMove}
