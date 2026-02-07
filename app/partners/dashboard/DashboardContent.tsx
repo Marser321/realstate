@@ -19,6 +19,9 @@ import {
 import { PropertiesTable } from '@/components/partners/PropertiesTable'
 import { useUserAgency, useAuth } from '@/hooks/useAuth'
 import { getSupabaseBrowserClient } from '@/lib/supabase-browser'
+import { DashboardSkeleton } from '@/components/partners/DashboardSkeleton'
+import { WelcomeOnboarding } from '@/components/partners/WelcomeOnboarding'
+import { ProfileProgress } from '@/components/partners/ProfileProgress'
 
 // Property type for the table
 interface PropertyRow {
@@ -199,12 +202,8 @@ export default function DashboardPage() {
     }
 
     // Loading state
-    if (authLoading || agencyLoading) {
-        return (
-            <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
-            </div>
-        )
+    if (authLoading || agencyLoading || loading) {
+        return <DashboardSkeleton />
     }
 
     // No agency state
@@ -230,6 +229,8 @@ export default function DashboardPage() {
         )
     }
 
+    const hasProperties = properties.length > 0
+
     return (
         <div className="min-h-[calc(100vh-4rem)] p-6 md:p-8">
             {/* Generic Toast */}
@@ -248,96 +249,109 @@ export default function DashboardPage() {
 
             <div className="max-w-7xl mx-auto space-y-8">
                 {/* Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex flex-col md:flex-row md:items-center justify-between gap-4"
-                >
-                    <div>
-                        <h1 className="text-2xl md:text-3xl font-serif font-bold text-foreground">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="lg:col-span-2"
+                    >
+                        <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground">
                             Bienvenido, <span className="text-gold">{agency.name}</span>
                         </h1>
-                        <p className="text-muted-foreground mt-1">
-                            Gestiona tus propiedades y analiza su rendimiento
+                        <p className="text-muted-foreground mt-2 text-lg">
+                            {hasProperties
+                                ? 'Gestiona tus propiedades y analiza su rendimiento en tiempo real.'
+                                : 'Tu portal de crecimiento está listo. Comienza tu trayectoria de éxito hoy.'}
                         </p>
-                    </div>
-                    <a
-                        href="/partners/dashboard/new"
-                        className="btn-luxe py-2.5 px-5 rounded-xl text-white font-medium flex items-center gap-2 w-fit"
+                        {hasProperties && (
+                            <div className="mt-6">
+                                <a
+                                    href="/partners/dashboard/new"
+                                    className="btn-luxe py-3 px-6 rounded-xl text-white font-medium flex items-center gap-2 w-fit"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                    Nueva Propiedad
+                                </a>
+                            </div>
+                        )}
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
                     >
-                        <Plus className="w-4 h-4" />
-                        Nueva Propiedad
-                    </a>
-                </motion.div>
+                        <ProfileProgress agency={{ ...agency, has_properties: hasProperties }} />
+                    </motion.div>
+                </div>
 
-                {/* Stats Grid */}
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
-                >
-                    <StatCard
-                        icon={Home}
-                        label="Total Propiedades"
-                        value={properties.length}
-                        color="gold"
-                    />
-                    <StatCard
-                        icon={Eye}
-                        label="Vistas del Mes"
-                        value={(agency.total_views || 0).toLocaleString()}
-                        trend="+12% vs mes anterior"
-                        color="blue"
-                    />
-                    <StatCard
-                        icon={Star}
-                        label="Propiedades Destacadas"
-                        value={properties.filter(p => p.is_featured).length}
-                        color="gold"
-                    />
-                    <StatCard
-                        icon={DollarSign}
-                        label="Valor Total Inventario"
-                        value={formatTotalValue(totalValue)}
-                        color="green"
-                    />
-                </motion.div>
+                {!hasProperties ? (
+                    <WelcomeOnboarding />
+                ) : (
+                    <>
+                        {/* Stats Grid */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 }}
+                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+                        >
+                            <StatCard
+                                icon={Home}
+                                label="Total Propiedades"
+                                value={properties.length}
+                                color="gold"
+                            />
+                            <StatCard
+                                icon={Eye}
+                                label="Vistas del Mes"
+                                value={(agency.total_views || 0).toLocaleString()}
+                                trend="+12% vs mes anterior"
+                                color="blue"
+                            />
+                            <StatCard
+                                icon={Star}
+                                label="Propiedades Destacadas"
+                                value={properties.filter(p => p.is_featured).length}
+                                color="gold"
+                            />
+                            <StatCard
+                                icon={DollarSign}
+                                label="Valor Total Inventario"
+                                value={formatTotalValue(totalValue)}
+                                color="green"
+                            />
+                        </motion.div>
 
-                {/* Properties Table */}
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="glass-card rounded-xl overflow-hidden"
-                >
-                    <div className="p-5 border-b border-border/50">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-lg font-semibold text-foreground">
-                                Mis Propiedades
-                            </h2>
-                            <a
-                                href={`/agencia/${agency.slug}`}
-                                className="text-sm text-gold hover:underline flex items-center gap-1"
-                            >
-                                Ver perfil público
-                                <ExternalLink className="w-3 h-3" />
-                            </a>
-                        </div>
-                    </div>
+                        {/* Properties Table */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="glass-card rounded-xl overflow-hidden shadow-2xl shadow-gold/5"
+                        >
+                            <div className="p-5 border-b border-border/50 bg-background/50 backdrop-blur-md">
+                                <div className="flex items-center justify-between">
+                                    <h2 className="text-lg font-semibold text-foreground">
+                                        Mis Propiedades Activas
+                                    </h2>
+                                    <a
+                                        href={`/agencia/${agency.slug}`}
+                                        className="text-sm text-gold hover:underline flex items-center gap-1 group"
+                                    >
+                                        Ver perfil público
+                                        <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                                    </a>
+                                </div>
+                            </div>
 
-                    {loading ? (
-                        <div className="py-12 flex justify-center">
-                            <div className="w-6 h-6 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
-                        </div>
-                    ) : (
-                        <PropertiesTable
-                            properties={properties}
-                            onToggleFeatured={handleToggleFeatured}
-                            onEdit={handleEdit}
-                        />
-                    )}
-                </motion.div>
+                            <PropertiesTable
+                                properties={properties}
+                                onToggleFeatured={handleToggleFeatured}
+                                onEdit={handleEdit}
+                            />
+                        </motion.div>
+                    </>
+                )}
 
                 {/* Quick Actions */}
                 <motion.div

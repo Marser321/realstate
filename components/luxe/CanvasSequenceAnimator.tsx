@@ -41,6 +41,8 @@ export function CanvasSequenceAnimator({
         const loadedImages: HTMLImageElement[] = [];
         let loadedCount = 0;
 
+        console.log(`Starting to load ${frameCount} images for sequence: ${frameUrlPattern}`);
+
         const loadImage = (index: number): Promise<HTMLImageElement> => {
             return new Promise((resolve, reject) => {
                 const paddedIndex = String(index).padStart(4, '0');
@@ -55,7 +57,10 @@ export function CanvasSequenceAnimator({
                     resolve(img);
                 };
 
-                img.onerror = () => reject(new Error(`Failed to load: ${url}`));
+                img.onerror = () => {
+                    console.error(`Failed to load image at: ${url}`);
+                    reject(new Error(`Failed to load: ${url}`));
+                };
                 img.src = url;
             });
         };
@@ -66,11 +71,15 @@ export function CanvasSequenceAnimator({
                 const allImages = await Promise.all(promises);
 
                 if (isMounted) {
+                    console.log('All images loaded successfully');
                     setImages(allImages);
                     setIsLoading(false);
                 }
             } catch (error) {
-                console.error('Error loading images:', error);
+                console.error('Error loading sequence images:', error);
+                // Even if some fail, let's try to proceed if we have some images? 
+                // Or at least set loading false so we don't get stuck.
+                if (isMounted) setIsLoading(false);
             }
         };
 
